@@ -4,6 +4,7 @@ import startHandler from './startHandler';
 import processInfHandler from './processInfoHandler';
 import encodeHandler from './encodeHandler';
 import decodeHandler from './decodeHandler';
+import detectHandler from './detectHandler';
 
 const composer = new Composer();
 
@@ -11,6 +12,7 @@ composer.command('start', startHandler);
 composer.command('procinfo', processInfHandler);
 composer.command('encode', encodeHandler);
 composer.command('decode', decodeHandler);
+composer.command('detect', detectHandler);
 
 
 
