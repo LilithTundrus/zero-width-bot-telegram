@@ -15,6 +15,9 @@ import session from 'telegraf/session';
 import { Message } from 'telegram-typings';
 // #endregion
 
+// TODO: Handle messages that end up being over 2,048 characters
+// TODO: Figure out how to let users set an encode message 'container' and a desired message to hide
+
 /* 
 Gaols/Features:
 This bot will be for decoding/encoding messages through telegram using zero-width characters
