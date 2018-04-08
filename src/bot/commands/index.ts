@@ -1,4 +1,5 @@
 'use strict';
+import Composer from 'telegraf';
 import startHandler from './startHandler';
 import processInfHandler from './processInfoHandler';
 
