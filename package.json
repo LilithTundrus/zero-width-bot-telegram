@@ -1,0 +1,37 @@
+{
+  "name": "zero-width-bot-telegram",
+  "version": "0.0.2",
+  "description": "A bot for telegram to decode/encode hidden messages using zero-width characters (typically invisible)",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "zero-width",
+    "econding",
+    "secret",
+    "messages"
+  ],
+  "repository": {
+    "url": "https://github.com/LilithTundrus/zero-width-bot-telegram"
+  },
+  "bugs": {
+    "url": "https://github.com/LilithTundrus/zero-width-bot-telegram/issues"
+  },
+  "author": "Lilith Tundrus",
+  "license": "MIT",
+  "dependencies": {
+    "colorful-log-levels": "^0.2.0",
+    "telegraf": "^3.20.0",
+    "telegraf-ratelimit": "^2.0.0",
+    "telegram-typings": "^0.3.5-3"
+  },
+  "devDependencies": {
+    "@types/node": "^9.6.2"
+  }
+}
