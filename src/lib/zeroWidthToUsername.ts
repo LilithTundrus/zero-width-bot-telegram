@@ -13,8 +13,10 @@ const binaryToText = (stringToCOnvert: string) => (
     stringToCOnvert.split(' ').map(num => String.fromCharCode(parseInt(num, 2))).join('')
 );
 
-export default (zeroWidthUsername) => {
+const zeroWidthToString = (zeroWidthUsername) => {
     const binaryUsername = zeroWidthToBinary(zeroWidthUsername);
     const textUsername = binaryToText(binaryUsername);
     return textUsername;
 };
+
+export default zeroWidthToString;
