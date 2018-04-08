@@ -1,5 +1,5 @@
 'use strict';
-import * as stringToZeroWidth from '../../lib/usernameToZeroWidth';
+import * as stringToZeroWidth from '../../lib/stringToZeroWidth';
 
 // handle /encode command calls
 export default async function encodeHandler(ctx) {
@@ -14,7 +14,9 @@ export default async function encodeHandler(ctx) {
     console.log(messageToEncode)
     let zeroWidthString = stringToZeroWidth.default(messageToEncode);
     // console.log(`This contains your message ${zeroWidthString}`)
-    return ctx.reply(`AAAA${zeroWidthString}`)
+    // TODO: We want this to allow the user to make a container with the encode message,
+    // the bot accepting the container and then asking for a message to hid inside the container
+    return ctx.reply(`This contains your hidden message${zeroWidthString}`)
         .then(() => ctx.time('encoded reply message sent!'));
     }
 }
