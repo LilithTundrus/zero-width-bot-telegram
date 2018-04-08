@@ -2,11 +2,11 @@
 import * as zeroWidthToString from '../../lib/zeroWidthToString';
 
 // handle /encode command calls
-export default async function startHandler(ctx) {
+export default async function decodeHandler(ctx) {
     ctx.resetTimer();
     ctx.time('Got decode message...');
     ctx.logger.info(`decode from ${JSON.stringify(ctx.message.from)}`);
-    let messageToDecode: string = ctx.message.text.substring(8);
+    let messageToDecode: string = ctx.message.text.substring(8).trim();
     // make sure the /decode argument has a string to decode
     if (messageToDecode.length < 1) {
         return ctx.reply(`Please give a message to decode`)
@@ -14,7 +14,6 @@ export default async function startHandler(ctx) {
     } else {
         // Check if the message is even something we need to decode!
         let stringFromZeroWidth = zeroWidthToString.default(messageToDecode);
-        console.log(stringFromZeroWidth.length);
         // The length returned is always at the least 2, even with a single character provided which is weird
         if (stringFromZeroWidth.length <= 2) {
             // Message does not contain anything we can decode
