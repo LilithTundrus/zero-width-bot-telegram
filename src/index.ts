@@ -28,7 +28,7 @@ const limitConfig = {
     window: 3000,
     limit: 3,
     onLimitExceeded: ((ctx, next) => {
-        logger.warn(`${ctx.message.from.username} exceeded the rate limit.`);
+        logger.warn(`${ctx.message.from.username} exceeded the rate limit at ${new Date().toTimeString()}`);
         ctx.reply('Rate limit exceeded. This instance will be reported.');
     })
 };
@@ -76,7 +76,7 @@ bot.context.logger = logger;
 
 // Listen for any message sent to the bot (does not capture commands)
 bot.on('message', (ctx) => {
-    return ctx.logger.debug(`${ctx.message.from.username} sent ${ctx.message.text} at ${Date.now()}`);
+    return ctx.logger.debug(`${ctx.message.from.username} sent ${ctx.message.text} at ${new Date().toTimeString()}`);
 });
 
 bot.catch((err) => {
