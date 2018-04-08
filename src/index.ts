@@ -18,6 +18,8 @@ import { Message } from 'telegram-typings';
 /* 
 Gaols/Features:
 This bot will be for decoding/encoding messages through telegram using zero-width characters
+
+It should also be able to detect for the user if a message has or hasn't been fingerprinted with zero-width characters
 */
 let logger = new Logger('../logs', logLevels.error, true);
 
