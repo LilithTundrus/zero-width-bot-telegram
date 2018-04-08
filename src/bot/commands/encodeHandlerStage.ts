@@ -6,7 +6,10 @@ const { enter, leave } = Stage;
 const encodeScene = new Scene('encode');
 
 encodeScene.enter((ctx) => {
-    return ctx.reply('You are in the decode scene now! use /back to leave');
+    console.log(ctx.chat.id)
+    // we may need to create a local object here if we're storing any amount of temporary user data
+    return ctx.reply('You are in the decode scene now! use /back to leave. use /c to set container message, use /m to set the hideen message');
+    // send the text markup
 });
 
 encodeScene.leave((ctx) => {
@@ -15,6 +18,9 @@ encodeScene.leave((ctx) => {
 });
 encodeScene.command('back', leave());
 
+encodeScene.hears('/c', (ctx) => {
+    console.log(ctx.message.text.substring(3).trim())
+})
 
 export default encodeScene;
 
