@@ -18,6 +18,7 @@ export default async function detectHandler(ctx) {
         // The length returned is always at the least 2, even with a single character provided which is weird
         if (stringFromZeroWidth.length <= 2) {
             // Message does not contain anything we can detect
+            ctx.telegram.sendChatAction(ctx.chat.id, 'typing')
             return ctx.reply(`Given message did not contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`)
                 .then(() => ctx.time('detect error message sent!'));
         }
