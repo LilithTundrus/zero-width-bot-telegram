@@ -1,3 +1,4 @@
+import * as stringToZeroWidth from '../../lib/stringToZeroWidth';
 import Stage from 'telegraf/stage';
 import Scene from 'telegraf/scenes/base';
 
@@ -48,7 +49,15 @@ encodeScene.command('m', (ctx) => {
 })
 
 encodeScene.command('done', (ctx) => {
-
+    // get the user's temp message and data
+    let userData = getUserData(ctx.chat.id)
+    if (userData.container.length > 1 && userData.container.length > 1) {
+        let zeroWidthString = stringToZeroWidth.default(userData.message);
+        ctx.reply('Got it, your message is below:');
+        return ctx.reply(`${userData.container}${zeroWidthString}`);
+    } else {
+        return ctx.reply('Please make sure you have set a container and message using the /c and /m command')
+    }
 })
 
 
