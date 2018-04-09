@@ -13,7 +13,7 @@ encodeScene.enter((ctx) => {
     tempUserDataArray.push(generateTempObj(ctx.message.from.id));
     // we may need to create a local object here if we're storing any amount of temporary user data
     console.log(ctx.chat)
-    return ctx.reply('You are in the decode scene now! use /back to leave. use /c to set container message, use /m to set the hideen message');
+    return ctx.reply('You are in the decode scene now! use /back to leave. use /c to set container message, use /m to set the hideen message. use /done to get your container with the hidden message');
     // send the text markup
     // maybe we run a .next chain?
 })
@@ -27,7 +27,6 @@ encodeScene.leave((ctx) => {
 encodeScene.command('back', leave());
 
 encodeScene.command('c', (ctx) => {
-    console.log(ctx.chat);
     let container = ctx.message.text.substring(3).trim();
     console.log(container);
     if (container.length < 1) {
@@ -35,6 +34,20 @@ encodeScene.command('c', (ctx) => {
     }
     setUserContainer(container, ctx.message.from.id);
     // assign the temp variable for the message
+})
+
+encodeScene.command('m', (ctx) => {
+    let message = ctx.message.text.substring(3).trim();
+    console.log(message);
+    if (message.length < 1) {
+        return ctx.reply('please give a message to encode!');
+    }
+    // assign the temp variable for the message
+    setUserMessage(message, ctx.message.from.id);
+    // check if both message and container have been set
+})
+
+encodeScene.command('done', (ctx) => {
 
 })
 
@@ -57,8 +70,30 @@ function setUserContainer(container: string, teleID: string) {
     }
 }
 
-function removeTempUser(teleID) {
+function setUserMessage(message: string, teleID: string) {
+    for (let userData of tempUserDataArray) {
+        if (userData.teleID == teleID) {
+            userData.message = message;
+            console.log(userData)
+        }
+    }
+}
 
+function getUserData(teleID) {
+    for (let userData of tempUserDataArray) {
+        if (userData.teleID == teleID) {
+            return userData;
+        }
+    }
+}
+
+function removeTempUser(teleID) {
+    for (var i = tempUserDataArray.length - 1; i >= 0; --i) {
+        if (tempUserDataArray[i].teleID == teleID) {
+            tempUserDataArray.splice(i, 1);
+            console.log('removed user from temp list!');
+        }
+    }
 }
 
 export default encodeScene;
