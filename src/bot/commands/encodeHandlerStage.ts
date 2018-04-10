@@ -60,16 +60,18 @@ encodeScene.command('done', (ctx) => {
 })
 
 // This is listening for the callback buttons
-encodeScene.action(/.+/, (ctx) => {
-
-    if (ctx.match[0] == 'exit') {
-        console.log(ctx.callbackQuery)
-        // 'answer' the CB, making the loading icon go away
-        ctx.answerCbQuery(ctx.callbackQuery.data)
-        ctx.scene.leave();
-    }
+encodeScene.action('exit', (ctx) => {
+    console.log(ctx.callbackQuery)
+    // 'answer' the CB, making the loading icon go away
+    ctx.answerCbQuery(ctx.callbackQuery.data)
+    ctx.scene.leave();
 });
 
+encodeScene.action('message', (ctx) => {
+    ctx.answerCbQuery(ctx.callbackQuery.data)
+    ctx.reply('Enter the message you want Hidden in your container')
+    // get input from the user
+})
 // CRUD functions for temporary user objects
 // TODO make this an interface to we can correctly describe the object, even if it's temp stuff
 function createTemUser(teleID: string) {
