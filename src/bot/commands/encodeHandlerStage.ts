@@ -57,6 +57,7 @@ encodeScene.command('done', (ctx) => {
 })
 
 // CRUD functions for temporary user objects
+// TODO make this an interface to we can correctly describe the object, even if it's temp stuff
 function createTemUser(teleID: string) {
     let tempUserDataObj = {
         container: '',

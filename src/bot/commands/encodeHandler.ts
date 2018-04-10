@@ -1,6 +1,8 @@
 'use strict';
 import * as stringToZeroWidth from '../../lib/stringToZeroWidth';
 
+// TODO: Require at least 2 words to hide the text in
+
 // handle /encode command calls
 export default async function encodeHandler(ctx) {
     ctx.resetTimer();
