@@ -10,7 +10,7 @@ export default async function encodeHandler(ctx) {
     ctx.logger.info(`encode request from ${JSON.stringify(ctx.message.from)}`);
     let messageToEncode: string = ctx.message.text.substring(8).trim();
     if (messageToEncode.length < 1) {
-        return ctx.reply(`Please give a message to encode`);
+        return ctx.reply(`Please give a message to encode with the /encode command`);
     } else {
     // We want to be able to take a placeholder string from the user
     let zeroWidthString = stringToZeroWidth.default(messageToEncode);

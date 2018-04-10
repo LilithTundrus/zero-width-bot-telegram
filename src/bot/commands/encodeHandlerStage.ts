@@ -1,6 +1,7 @@
 import * as stringToZeroWidth from '../../lib/stringToZeroWidth';
 import Stage from 'telegraf/stage';
 import Scene from 'telegraf/scenes/base';
+import { messageKeyboard } from '../keyboardMarkups';
 
 const { enter, leave } = Stage;
 const encodeScene = new Scene('encode');
@@ -12,7 +13,7 @@ let tempUserDataArray = [];
 encodeScene.enter((ctx) => {
     // generate an object per user call 
     tempUserDataArray.push(createTemUser(ctx.message.from.id));
-    return ctx.reply('You are in the encode command now! use /back to leave. use /c + message to set container message, use /m + message to set the hideen message. use /done to get your container with the hidden message.');
+    return ctx.reply('You are in the encode command now! use /back to leave. use /c + message to set container message, use /m + message to set the hideen message. use /done to get your container with the hidden message.', messageKeyboard);
     // send the keyboard markup
 })
 
@@ -24,6 +25,8 @@ encodeScene.leave((ctx) => {
 // TODO: if any base commands are given, let the user know they're not in the base scene!
 // TODO: at the end of /c and /m, check if the user has both data points and send the 
 // message without the need for /done to be used
+// TODO: Use fancy buttons/icons instead of commands
+// TODO: We want this to also accept files when a button is pressed
 encodeScene.command('back', leave());
 
 encodeScene.command('c', (ctx) => {
@@ -55,6 +58,17 @@ encodeScene.command('done', (ctx) => {
         return ctx.reply('Please make sure you have set a container and message using the /c and /m command');
     }
 })
+
+// This is listening for the callback buttons
+encodeScene.action(/.+/, (ctx) => {
+
+    if (ctx.match[0] == 'exit') {
+        console.log(ctx.callbackQuery)
+        // 'answer' the CB, making the loading icon go away
+        ctx.answerCbQuery(ctx.callbackQuery.data)
+        ctx.scene.leave();
+    }
+});
 
 // CRUD functions for temporary user objects
 // TODO make this an interface to we can correctly describe the object, even if it's temp stuff
