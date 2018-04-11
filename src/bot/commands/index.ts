@@ -13,9 +13,10 @@ import decodeHandler from './decodeHandler';
 import detectHandler from './detectHandler';
 
 import encodeScene from './encodeHandlerStage';
+import detectScene from './detectHandlerScene';
 
 // Literally set the stages for the composer to user as middleware for certain commands
-const stage = new Stage([encodeScene]);
+const stage = new Stage([encodeScene, detectScene]);
 const { enter, leave } = Stage;
 
 const composer = new Composer();
@@ -30,6 +31,11 @@ composer.command('procinfo', processinfoHandler);
 composer.command('encode', encodeHandler);
 composer.command('decode', decodeHandler);
 composer.command('detect', detectHandler);
-composer.command('encodenew', enter('encode'))
+composer.command('encodenew', enter('encode'));
+composer.command('detectnew', enter('detect'));
+
+
+// listen for specific commands from the main menu
+composer.hears('🔍 Detect', enter('detect'));
 
 export = composer;
