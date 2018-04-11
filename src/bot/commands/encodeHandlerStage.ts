@@ -26,7 +26,7 @@ encodeScene.leave((ctx) => {
 // TODO: at the end of /c and /m, check if the user has both data points and send the 
 // message without the need for /done to be used
 // TODO: Use fancy buttons/icons instead of commands
-// TODO: We want this to also accept files when a button is pressed
+// TODO: We want this to also accept files to encode
 encodeScene.command('back', leave());
 
 encodeScene.command('c', (ctx) => {
@@ -69,9 +69,26 @@ encodeScene.action('exit', (ctx) => {
 
 encodeScene.action('message', (ctx) => {
     ctx.answerCbQuery(ctx.callbackQuery.data)
-    ctx.reply('Enter the message you want Hidden in your container')
-    // get input from the user
+    ctx.reply('Enter the message you want hidden in your container');
+    // get next input from the user
 })
+
+encodeScene.action('container', (ctx) => {
+    ctx.answerCbQuery(ctx.callbackQuery.data)
+    ctx.reply('Enter the container you want to hide your message in');
+    // get next input from the user
+})
+
+// encoding files in another file may get complicated??
+// we need to get the encode text, 
+encodeScene.action('file', (ctx) => {
+    ctx.answerCbQuery(ctx.callbackQuery.data)
+    ctx.reply('Send a file in **.txt** form to encode a message into, then you can either choose a message to hide in the text or submit another **.txt** file to encode within the first!');
+    // get next input from the user
+})
+
+
+
 // CRUD functions for temporary user objects
 // TODO make this an interface to we can correctly describe the object, even if it's temp stuff
 function createTemUser(teleID: string) {
