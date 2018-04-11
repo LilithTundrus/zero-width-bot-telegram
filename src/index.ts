@@ -18,7 +18,8 @@ import { Message } from 'telegram-typings';
 // TODO: Handle messages that end up being over 2,048 characters
 // TODO: Figure out how to let users set an encode message 'container' and a desired message to hide
 // TODO: Handle groups vs. individual in the /start
-// TODO: Make this less janky!!!!
+// TODO: Create a main menu!
+// TODO: This need quite a lot of housekeeping to stay user-friendly!!!!
 
 /* 
 Gaols/Features:

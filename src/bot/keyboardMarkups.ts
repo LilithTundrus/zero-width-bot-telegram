@@ -15,9 +15,7 @@ const messageKeyboard = Extra.HTML().markup((m) =>
 const mainMenuKeyboard = Markup.keyboard([
     ['🔍 Detect'],
     ['✉️ Encode', '📨 Decode'],
-])
-    .resize()
-    .extra()
+]).resize().extra();
 
 
 
