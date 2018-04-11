@@ -60,8 +60,28 @@ detectScene.on('text', (ctx) => {
 
 // on document, check file type and attempt a detect
 detectScene.on('document', (ctx) => {
-    console.log(ctx)
-    ctx.reply('got it!')
+    if (ctx.message.document.file_name.includes('.txt')) {
+        // TODO: we should do a much more stringent check
+        ctx.reply(`Processing: ${ctx.message.document.file_name}`)
+            .then((ctx) => {
+                // we need the ID to later edit
+                console.log(ctx);
+                // process the document by reading the file one another thread (potentially using fibers)
+            })
+                        // make sure the file isn't stupid large here! 16kb maybe?
+        console.log(ctx.message.document)
+        ctx.telegram.getFileLink(ctx.message.document.file_id)
+            .then((link) => {
+                // link to download the file
+                console.log(link);
+                // get the file using request (lazy, no downloading)
+
+            })
+        // get the file from telegram
+    } else {
+        ctx.reply(`Please send a file in .txt format`);
+    }
+
 })
 
 export default detectScene;
