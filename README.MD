@@ -1,6 +1,6 @@
 # zero-width-bot-telegram
 
-My telegram: [![Telegram](https://img.shields.io/badge/Telegram-Lilith%20Tundrus-blue.svg)](https://telegram.me/lilithtundrus)
+[![Telegram](https://img.shields.io/badge/Telegram-Lilith%20Tundrus-blue.svg)](https://telegram.me/lilithtundrus) [![Build Status](https://travis-ci.org/LilithTundrus/zero-width-bot-telegram.svg?branch=master)](https://travis-ci.org/LilithTundrus/zero-width-bot-telegram)
 
 **PLEASE NOTE THIS IS IN ALPHA DEVELOPMENT PHASE** 
 
