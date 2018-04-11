@@ -1,4 +1,5 @@
 const Extra = require('telegraf/extra');
+const Markup = require('telegraf/markup')
 
 
 const messageKeyboard = Extra.HTML().markup((m) =>
@@ -11,4 +12,13 @@ const messageKeyboard = Extra.HTML().markup((m) =>
     ], { columns: 2 }
     ));
 
-export { messageKeyboard }
+const mainMenuKeyboard = Markup.keyboard([
+    ['🔍 Detect'],
+    ['✉️ Encode', '📨 Decode'],
+])
+    .resize()
+    .extra()
+
+
+
+export { messageKeyboard, mainMenuKeyboard }
