@@ -27,6 +27,7 @@
   "license": "MIT",
   "dependencies": {
     "colorful-log-levels": "^0.2.0",
+    "request": "^2.85.0",
     "telegraf": "^3.20.0",
     "telegraf-ratelimit": "^2.0.0",
     "telegram-typings": "^0.3.5-3"
