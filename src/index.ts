@@ -20,6 +20,7 @@ import { Message } from 'telegram-typings';
 // TODO: Handle groups vs. individual in the /start
 // TODO: Create a main menu!
 // TODO: This need quite a lot of housekeeping to stay user-friendly!!!!
+// TODO: Make sure this is using async and properly non-block threading
 
 /* 
 Gaols/Features:
@@ -76,6 +77,8 @@ if (debug) elapsedTime('Bot polling started');
 logger.info(`zero-width-message-bot ${ver} started at: ${new Date().toISOString()}`);
 
 // Attach functions/classes to the bot's context arguments passed to functions
+
+// TODO: Add a user middleware here to GET and SET certain temp variables??
 bot.context.time = elapsedTime;
 bot.context.resetTimer = resetTimer;
 bot.context.logger = logger;

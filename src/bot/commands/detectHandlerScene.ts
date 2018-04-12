@@ -4,6 +4,7 @@ import Stage from 'telegraf/stage';
 import Scene from 'telegraf/scenes/base';
 import * as request from 'request';
 import { detectKeyboard } from '../keyboardMarkups';
+import { adminID } from '../../config/config';
 
 const { enter, leave } = Stage;
 const detectScene = new Scene('detect');
@@ -11,8 +12,10 @@ const detectScene = new Scene('detect');
 // on enter, give a couple options and an explanation
 detectScene.enter((ctx) => {
     // send the keyboard markup
+    console.log(ctx)
     return ctx.reply('You are in detect mode now! use /back to leave, send a message or file to be processed.', detectKeyboard)
         .then((ctx) => {
+            // THIS IS THE MESSAGE WE EDIT FOR ALL REPLIES TO THE USER
             console.log(ctx);
             // get the id of the message sent to later edit after user input is given (eventually)
         })
@@ -52,29 +55,28 @@ detectScene.on('text', (ctx) => {
         // leave the scene and enter the next
     }
     // Check if the message is has zero-wdith characters
-    let stringFromZeroWidth = zeroWidthToString.default(userMessage);
-    // The length returned is always at the least 2, even with a single character provided which is weird
-    if (stringFromZeroWidth.length <= 2) {
+    if (zeroWidthCheck(userMessage) == false) {
         // Message does not contain anything we can detect
         // ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
         return ctx.reply(`Given message did not contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`);
     }
+    let stringFromZeroWidth = zeroWidthToString.default(userMessage);
     return ctx.reply(`String found by decoding zero-wdith characters: ${stringFromZeroWidth}\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`);
 })
 
 // on document, check file type and attempt a detect
 detectScene.on('document', (ctx) => {
     if (ctx.message.document.file_name.includes('.txt') && ctx.message.document.mime_type == 'text/plain') {
-        console.log(ctx.message.document)
         // TODO: we should do a much more stringent check through telegram file-type property
+        let messageToEdit = '';
         ctx.reply(`Processing: ${ctx.message.document.file_name}`)
             .then((ctx) => {
                 // we need the ID to later edit
-                console.log(ctx);
+                console.log(ctx.message_id);
+                // this may need to go into a per-user object???
+                messageToEdit = ctx.message_id;
                 // process the document by reading the file one another thread (potentially using fibers)
             })
-        // make sure the file isn't stupid large here! 16kb maybe?
-        console.log(ctx.message.document)
         // get the file from telegram
         ctx.telegram.getFileLink(ctx.message.document.file_id)
             .then((link) => {
@@ -84,18 +86,24 @@ detectScene.on('document', (ctx) => {
                 requestUrl(link, 'zero-width-bot-telegram-0.0.1')
                     .then((results) => {
                         // this should be plain text that we can clean
-                        console.log(results);
+                        // console.log(results);
                         // start typing a reply
                         // check for any zero-width characters
-                        console.log(zeroWidthToString.default(results).length);
-                        ctx.telegram.sendChatAction(ctx.chat.id, 'typing')
-                            .then((ctx) => {
-
-                            })
+                        ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
+                        console.log(zeroWidthToString.default(results.toString()))
+                        // this is currently bugging out and always reporting false for files??
+                        if (zeroWidthCheck(results) == false) {
+                            return ctx.reply(`Given file did not contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`);
+                        }
+                        let stringFromZeroWidth = zeroWidthToString.default(results);
+                        return ctx.reply(`String found by decoding zero-wdith characters: ${stringFromZeroWidth}\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`);
                         // edit the main message with the results
                     })
                     .catch((err) => {
                         // let the user know something went wrong and send a message to the admin
+                        ctx.reply(`Looks like something went wrong with parsing your file. I've sent a ticket about the issue, please try again later!`)
+                        ctx.telegram.sendMessage(adminID, err);
+                        ctx.logger.error(err);
                     })
             })
         // check file size (should be under 16k)
@@ -127,6 +135,18 @@ function requestUrl(url: string, userAgent: string): Promise<any> {
             return resolve(body);
         })
     })
+}
+
+function zeroWidthCheck(textToCheck: string) {
+    let stringFromZeroWidth = zeroWidthToString.default(textToCheck);
+    // The length returned is always at the least 2, even with a single character provided which is weird
+    if (stringFromZeroWidth.length <= 2) {
+        return false;
+    }
+    else {
+        return true;
+    }
+
 }
 
 export default detectScene;
