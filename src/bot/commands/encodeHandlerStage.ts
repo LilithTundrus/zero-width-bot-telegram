@@ -12,8 +12,11 @@ let tempUserDataArray = [];
 // on the 'encode' command, a user is brought into a scene to craft a container and message
 encodeScene.enter((ctx) => {
     // generate an object per user call 
-    tempUserDataArray.push(createTemUser(ctx.message.from.id));
-    return ctx.reply('You are in the encode command now! use /back to leave. use /c + message to set container message, use /m + message to set the hideen message. use /done to get your container with the hidden message.', messageKeyboard);
+    tempUserDataArray.push(createTempUser(ctx.message.from.id));
+    return ctx.reply('You are in the encode command now! use /back to leave. use /c + message to set container message, use /m + message to set the hideen message. use /done to get your container with the hidden message.', messageKeyboard)
+        .then((ctx) => {
+            // get the id of the message sent to later edit after user input is given
+        })
     // send the keyboard markup
 })
 
@@ -71,6 +74,9 @@ encodeScene.action('message', (ctx) => {
     ctx.answerCbQuery(ctx.callbackQuery.data)
     ctx.reply('Enter the message you want hidden in your container');
     // get next input from the user
+    // Maybe we can on 'text' event, check for the last ctx.callbackquery.data response, or maybe even
+    // add it to the user data set?
+
 })
 
 encodeScene.action('container', (ctx) => {
@@ -83,7 +89,7 @@ encodeScene.action('container', (ctx) => {
 // we need to get the encode text, 
 encodeScene.action('file', (ctx) => {
     ctx.answerCbQuery(ctx.callbackQuery.data)
-    ctx.reply('Send a file in **.txt** form to encode a message into, then you can either choose a message to hide in the text or submit another **.txt** file to encode within the first!');
+    ctx.replyWithMarkdown('Send a file in **.txt** form to encode a message into, then you can either choose a message to hide in the text or submit another **.txt** file to encode within the first!');
     // get next input from the user
 })
 
@@ -91,7 +97,7 @@ encodeScene.action('file', (ctx) => {
 
 // CRUD functions for temporary user objects
 // TODO make this an interface to we can correctly describe the object, even if it's temp stuff
-function createTemUser(teleID: string) {
+function createTempUser(teleID: string) {
     let tempUserDataObj = {
         container: '',
         message: '',
