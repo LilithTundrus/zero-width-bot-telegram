@@ -2,6 +2,7 @@
 import * as zeroWidthToString from '../../lib/zeroWidthToString';
 import Stage from 'telegraf/stage';
 import Scene from 'telegraf/scenes/base';
+import * as request from 'request';
 import { detectKeyboard } from '../keyboardMarkups';
 
 const { enter, leave } = Stage;
@@ -10,8 +11,9 @@ const detectScene = new Scene('detect');
 // on enter, give a couple options and an explanation
 detectScene.enter((ctx) => {
     // send the keyboard markup
-    return ctx.reply('You are in detect mode now! use /back to leave, select an option to get started.', detectKeyboard)
+    return ctx.reply('You are in detect mode now! use /back to leave, send a message or file to be processed.', detectKeyboard)
         .then((ctx) => {
+            console.log(ctx);
             // get the id of the message sent to later edit after user input is given (eventually)
         })
 })
@@ -42,9 +44,15 @@ detectScene.action('file', (ctx) => {
 });
 
 // on text, attempt a detect
+// TODO: Edit the main message instead of sending more and more messages
 detectScene.on('text', (ctx) => {
+    let userMessage = ctx.message.text.trim();
+    // if text is a command like 💊 Clean, go to that scene!!
+    if (userMessage == '💊 Clean') {
+        // leave the scene and enter the next
+    }
     // Check if the message is has zero-wdith characters
-    let stringFromZeroWidth = zeroWidthToString.default(ctx.message.text);
+    let stringFromZeroWidth = zeroWidthToString.default(userMessage);
     // The length returned is always at the least 2, even with a single character provided which is weird
     if (stringFromZeroWidth.length <= 2) {
         // Message does not contain anything we can detect
@@ -56,7 +64,8 @@ detectScene.on('text', (ctx) => {
 
 // on document, check file type and attempt a detect
 detectScene.on('document', (ctx) => {
-    if (ctx.message.document.file_name.includes('.txt')) {
+    if (ctx.message.document.file_name.includes('.txt') && ctx.message.document.mime_type == 'text/plain') {
+        console.log(ctx.message.document)
         // TODO: we should do a much more stringent check through telegram file-type property
         ctx.reply(`Processing: ${ctx.message.document.file_name}`)
             .then((ctx) => {
@@ -72,10 +81,52 @@ detectScene.on('document', (ctx) => {
                 // link to download the file
                 console.log(link);
                 // get the file using request (lazy, no downloading)
+                requestUrl(link, 'zero-width-bot-telegram-0.0.1')
+                    .then((results) => {
+                        // this should be plain text that we can clean
+                        console.log(results);
+                        // start typing a reply
+                        // check for any zero-width characters
+                        console.log(zeroWidthToString.default(results).length);
+                        ctx.telegram.sendChatAction(ctx.chat.id, 'typing')
+                            .then((ctx) => {
+
+                            })
+                        // edit the main message with the results
+                    })
+                    .catch((err) => {
+                        // let the user know something went wrong and send a message to the admin
+                    })
             })
+        // check file size (should be under 16k)
+    } else if (ctx.message.document.file_size > 16000) {
+        ctx.reply(`Please send a file in text format under 16k`);
     } else {
         ctx.reply(`Please send a file in .txt format`);
     }
 })
+
+/**
+ * Request an e621 URL using constant headers (user-agent, etc.)
+ * @param {URL} url 
+ * @returns {Promise<any>}
+ */
+function requestUrl(url: string, userAgent: string): Promise<any> {
+    let options = {
+        uri: url,
+        headers: {
+            'User-Agent': userAgent
+        },
+        json: true
+    };
+    return new Promise((resolve, reject) => {
+        request.get(options, function (err: Error, response, body) {
+            if (err) {
+                return reject(err);
+            }
+            return resolve(body);
+        })
+    })
+}
 
 export default detectScene;
