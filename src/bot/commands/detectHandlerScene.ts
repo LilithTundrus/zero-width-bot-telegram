@@ -28,6 +28,7 @@ detectScene.leave((parentCtx) => {
 });
 
 detectScene.command('back', leave());
+detectScene.command('menu', leave());
 
 // Listen for an exit callback
 // TODO: DELETE any messages sent using a scene cleanup set of code
