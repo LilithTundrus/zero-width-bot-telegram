@@ -9,13 +9,13 @@ const { enter, leave } = Stage;
 const detectScene = new Scene('detect');
 
 // on enter, give a couple options and an explanation
-detectScene.enter((ctxParent) => {
+detectScene.enter((parentCtx) => {
     // send the keyboard markup
-    return ctxParent.reply('You are in 🔍 Detect mode now! use /back or the exit button to leave. Send a message or file to be processed.', detectKeyboard)
+    return parentCtx.reply('You are in 🔍 Detect mode now! use /back or the exit button to leave. Send a message or file to be processed.', detectKeyboard)
         .then((ctx) => {
             // get the id of the message sent to later edit after user input is given
-            ctxParent.session.messageToEdit = ctx.message_id;
-            ctxParent.session.lastSentMessage = 'You are in 🔍 Detect mode now! use /back or the exit button to leave. Send a message or file to be processed.';
+            parentCtx.session.messageToEdit = ctx.message_id;
+            parentCtx.session.lastSentMessage = 'You are in 🔍 Detect mode now! use /back or the exit button to leave. Send a message or file to be processed.';
         })
 })
 
