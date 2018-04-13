@@ -1,6 +1,5 @@
 'use strict';
 import Composer from 'telegraf';
-import Extra from 'telegraf/extra';
 import Stage from 'telegraf/stage';
 import Scene from 'telegraf/scenes/base';
 // Our custom imports to attach to the composer for telegram command handling
@@ -12,7 +11,8 @@ import encodeHandler from './encodeHandler';
 import decodeHandler from './decodeHandler';
 import detectHandler from './detectHandler';
 
-import encodeScene from './encodeHandlerStage';
+// Scenes (will be replacing basic commands above)
+import encodeScene from './encodeHandlerScene';
 import detectScene from './detectHandlerScene';
 
 // Literally set the stages for the composer to user as middleware for certain commands
@@ -30,9 +30,8 @@ composer.command('menu', menuHandler);
 composer.command('procinfo', processinfoHandler);
 composer.command('encode', encodeHandler);
 composer.command('decode', decodeHandler);
-composer.command('detect', detectHandler);
 composer.command('encodenew', enter('encode'));
-composer.command('detectnew', enter('detect'));
+composer.command('detect', enter('detect'));
 
 
 // listen for specific commands from the main menu
