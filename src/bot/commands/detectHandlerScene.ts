@@ -11,17 +11,20 @@ const detectScene = new Scene('detect');
 // on enter, give a couple options and an explanation
 detectScene.enter((ctxParent) => {
     // send the keyboard markup
-    return ctxParent.reply('You are in detect mode now! use /back or the exit button to leave. Send a message or file to be processed.', detectKeyboard)
+    return ctxParent.reply('You are in 🔍 Detect mode now! use /back or the exit button to leave. Send a message or file to be processed.', detectKeyboard)
         .then((ctx) => {
             // get the id of the message sent to later edit after user input is given
             ctxParent.session.messageToEdit = ctx.message_id;
+            ctxParent.session.lastSentMessage = 'You are in detect mode now! use /back or the exit button to leave. Send a message or file to be processed.';
         })
 })
 
-detectScene.leave((ctx) => {
-    ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, 'ℹ️ You just left the detect command, all base commands are now available using /menu!');
-    // Remove the temp var, allow for garbage collection
-    return ctx.session.messageToEdit = null;
+detectScene.leave((parentCtx) => {
+    parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, 'ℹ️ You just left the detect command, all base commands are now available using /menu!')
+        .then(() => {
+            // Remove the temp var, allow for garbage collection
+            return parentCtx.session.messageToEdit = null;
+        })
 });
 
 detectScene.command('back', leave());
@@ -35,43 +38,73 @@ detectScene.action('exit', (ctx) => {
 });
 
 detectScene.action('message', (ctx) => {
+    let messageToSend = 'ℹ️ Send me a copy-pasted set of text to check for zero-width characters!';
     // 'answer' the CB, making the loading icon go away
     ctx.answerCbQuery(ctx.callbackQuery.data);
-    ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, 'ℹ️ Send me a copy-pasted set of text to check for zero-width characters!', detectKeyboard);
+    if (ctx.session.lastSentMessage !== messageToSend) {
+        ctx.session.lastSentMessage = messageToSend;
+        return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, detectKeyboard);
+    }
 });
 
 detectScene.action('file', (ctx) => {
+    let messageToSend = 'ℹ️ Send a file to check for zero-width characters!';
     // 'answer' the CB, making the loading icon go away
     ctx.answerCbQuery(ctx.callbackQuery.data);
-    ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, 'ℹ️ Send a file to check for zero-width characters!', detectKeyboard);
+    if (ctx.session.lastSentMessage !== messageToSend) {
+        ctx.session.lastSentMessage = messageToSend;
+        return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, detectKeyboard);
+    }
 });
 
-// on text, attempt a detect
-// TODO: Edit the main message instead of sending more and more messages
+// on text, attempt a detect or scene change
 detectScene.on('text', (ctx) => {
     let userMessage = ctx.message.text.trim();
     // if text is a command like 💊 Clean, go to that scene!!
     // TODO: Do this for all base commands
     if (userMessage == '💊 Clean') {
         // leave the scene and enter the next
-        ctx.scene.leave();
-        enter('clean');
+        return ctx.scene.leave().then(() => {
+            return ctx.scene.enter('clean');
+        });
+    } else if (userMessage == '✉️ Encode') {
+        return ctx.scene.leave().then(() => {
+            return ctx.scene.enter('encode');
+        });
+    } else if (userMessage == '📨 Decode') {
+        return ctx.scene.leave().then(() => {
+            return ctx.scene.enter('decode');
+        });
     } else if (userMessage == '🔍 Detect') {
-
+        // Doesn't work more than once annoyingly
+        let messageToSend = 'ℹ️ You are already in the 🔍 Detect command!';
+        if (ctx.session.lastSentMessage !== messageToSend) {
+            ctx.session.lastSentMessage = messageToSend;
+            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, detectKeyboard);
+        }
     }
     // Check if the message is has zero-wdith characters
     if (zeroWidthCheck(userMessage) == false) {
         // Message does not contain anything we can detect
-        return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `✅ Given message did NOT contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`, detectKeyboard);
+        let messageToSend = `✅ Given message did NOT contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`;
+        if (ctx.session.lastSentMessage !== messageToSend) {
+            ctx.session.lastSentMessage = messageToSend;
+            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, detectKeyboard);
+        }
+    } else {
+        let stringFromZeroWidth = zeroWidthToString.default(userMessage);
+        let messageToSend = `⚠️ String found by decoding zero-wdith characters: ${stringFromZeroWidth}\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`;
+        if (ctx.session.lastSentMessage !== messageToSend) {
+            ctx.session.lastSentMessage = messageToSend;
+            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, detectKeyboard);
+        }
     }
-    let stringFromZeroWidth = zeroWidthToString.default(userMessage);
-    return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `⚠️ String found by decoding zero-wdith characters: ${stringFromZeroWidth}\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`, detectKeyboard);
 })
 
 // on document, check file type and attempt a detect
 detectScene.on('document', (ctx) => {
     if (ctx.message.document.file_name.includes('.txt') && ctx.message.document.mime_type == 'text/plain') {
-        ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `🕑 Processing: ${ctx.message.document.file_name}`)
+        ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `🕑 Processing: ${ctx.message.document.file_name} ...`);
         // process the document by reading the file  (potentially using fibers for threading)
         ctx.telegram.getFileLink(ctx.message.document.file_id)
             .then((link) => {
@@ -85,10 +118,12 @@ detectScene.on('document', (ctx) => {
                         console.log(zeroWidthToString.default(results));
                         if (zeroWidthCheck(results) == true) {
                             let stringFromZeroWidth = zeroWidthToString.default(results);
-                            // edit the main message with the results
-                            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `⚠️ Document contained zero-width characters. Attempted deocde of characters: ${stringFromZeroWidth}\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`, detectKeyboard);
+                            // edit the main message with the results, the previous message is ALWAYS 'Processing...
+                            let messageToSend = `⚠️ Document contained zero-width characters. Attempted deocde of characters: ${stringFromZeroWidth}\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`;
+                            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, detectKeyboard);
                         } else {
-                            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `✅ Given file did NOT contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`, detectKeyboard);
+                            let messageToSend = `✅ Given file did NOT contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`;
+                            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, detectKeyboard);
                         }
                     })
                     .catch((err) => {
@@ -101,9 +136,17 @@ detectScene.on('document', (ctx) => {
             })
         // check file size (should be under 16k)
     } else if (ctx.message.document.file_size > 16000) {
-        ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `⛔️ Please send a file in text format under 16k`, detectKeyboard);
+        let messageToSend = `⛔️ Please send a file in text format under 16k`;
+        if (ctx.session.lastSentMessage !== messageToSend) {
+            ctx.session.lastSentMessage = messageToSend;
+            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, detectKeyboard);
+        }
     } else {
-        ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `⛔️ Please send a file in .txt format`, detectKeyboard);
+        let messageToSend = `⛔️ Please send a file in .txt format`;
+        if (ctx.session.lastSentMessage !== messageToSend) {
+            ctx.session.lastSentMessage = messageToSend;
+            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, detectKeyboard);
+        }
     }
 })
 
