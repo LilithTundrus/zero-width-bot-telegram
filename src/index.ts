@@ -40,10 +40,6 @@ const limitConfig = {
     })
 };
 
-bot.telegram.getMe().then((botInfo) => {
-    bot.options.username = botInfo.username;
-});
-
 // Put middleware globally fo the bot here
 bot.use(
     session(),
