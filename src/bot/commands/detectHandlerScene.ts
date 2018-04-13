@@ -10,13 +10,16 @@ const { enter, leave } = Stage;
 const detectScene = new Scene('detect');
 
 // on enter, give a couple options and an explanation
-detectScene.enter((ctx) => {
+detectScene.enter((ctxParent) => {
     // send the keyboard markup
-    console.log(ctx)
-    return ctx.reply('You are in detect mode now! use /back to leave, send a message or file to be processed.', detectKeyboard)
+    console.log(ctxParent);
+    ctxParent.session.beh = 'fox';
+    return ctxParent.reply('You are in detect mode now! use /back to leave, send a message or file to be processed.', detectKeyboard)
         .then((ctx) => {
             // THIS IS THE MESSAGE WE EDIT FOR ALL REPLIES TO THE USER
             console.log(ctx);
+            console.log(ctxParent.session.beh)
+            // ctx.session.messageToEdit = ctx.message_id;
             // get the id of the message sent to later edit after user input is given (eventually)
         })
 })
@@ -67,7 +70,6 @@ detectScene.on('text', (ctx) => {
 // on document, check file type and attempt a detect
 detectScene.on('document', (ctx) => {
     if (ctx.message.document.file_name.includes('.txt') && ctx.message.document.mime_type == 'text/plain') {
-        // TODO: we should do a much more stringent check through telegram file-type property
         let messageToEdit = '';
         ctx.reply(`Processing: ${ctx.message.document.file_name}`)
             .then((ctx) => {
@@ -80,30 +82,29 @@ detectScene.on('document', (ctx) => {
         // get the file from telegram
         ctx.telegram.getFileLink(ctx.message.document.file_id)
             .then((link) => {
+                console.log(ctx.session.messageToEdit)
                 // link to download the file
                 console.log(link);
+                ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
                 // get the file using request (lazy, no downloading)
                 requestUrl(link, 'zero-width-bot-telegram-0.0.1')
                     .then((results) => {
                         // this should be plain text that we can clean
-                        // console.log(results);
-                        // start typing a reply
                         // check for any zero-width characters
-                        ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
                         console.log(zeroWidthToString.default(results.toString()))
                         // this is currently bugging out and always reporting false for files??
-                        if (zeroWidthCheck(results) == false) {
-                            return ctx.reply(`Given file did not contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`);
+                        if (zeroWidthCheck(results.toString()) == false) {
+                            return ctx.telegram.editMessageText(ctx.chat.id, messageToEdit, null, `Given file did not contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`);
                         }
                         let stringFromZeroWidth = zeroWidthToString.default(results);
-                        return ctx.reply(`String found by decoding zero-wdith characters: ${stringFromZeroWidth}\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`);
+                        return ctx.telegram.editMessageText(ctx.chat.id, messageToEdit, null, `String found by decoding zero-wdith characters: ${stringFromZeroWidth}\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`);
                         // edit the main message with the results
                     })
                     .catch((err) => {
                         // let the user know something went wrong and send a message to the admin
                         ctx.reply(`Looks like something went wrong with parsing your file. I've sent a ticket about the issue, please try again later!`)
-                        ctx.telegram.sendMessage(adminID, err);
-                        ctx.logger.error(err);
+                        ctx.telegram.sendMessage(adminID, err.toString());
+                        return ctx.logger.error(err);
                     })
             })
         // check file size (should be under 16k)
@@ -139,11 +140,11 @@ function requestUrl(url: string, userAgent: string): Promise<any> {
 
 function zeroWidthCheck(textToCheck: string) {
     let stringFromZeroWidth = zeroWidthToString.default(textToCheck);
+    console.log(zeroWidthToString.default(textToCheck).length)
     // The length returned is always at the least 2, even with a single character provided which is weird
     if (stringFromZeroWidth.length <= 2) {
         return false;
-    }
-    else {
+    } else {
         return true;
     }
 
