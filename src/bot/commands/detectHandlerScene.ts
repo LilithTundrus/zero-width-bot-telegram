@@ -13,13 +13,13 @@ const detectScene = new Scene('detect');
 detectScene.enter((ctxParent) => {
     // send the keyboard markup
     console.log(ctxParent);
-    ctxParent.session.beh = 'fox';
+    // ctxParent.session.messageToEdit = 'fox';
     return ctxParent.reply('You are in detect mode now! use /back to leave, send a message or file to be processed.', detectKeyboard)
         .then((ctx) => {
             // THIS IS THE MESSAGE WE EDIT FOR ALL REPLIES TO THE USER
             console.log(ctx);
-            console.log(ctxParent.session.beh)
-            // ctx.session.messageToEdit = ctx.message_id;
+            ctxParent.session.messageToEdit = ctx.message_id
+            console.log(ctxParent.session.messageToEdit)
             // get the id of the message sent to later edit after user input is given (eventually)
         })
 })
@@ -70,13 +70,11 @@ detectScene.on('text', (ctx) => {
 // on document, check file type and attempt a detect
 detectScene.on('document', (ctx) => {
     if (ctx.message.document.file_name.includes('.txt') && ctx.message.document.mime_type == 'text/plain') {
-        let messageToEdit = '';
-        ctx.reply(`Processing: ${ctx.message.document.file_name}`)
+        ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `Processing: ${ctx.message.document.file_name}`)
             .then((ctx) => {
                 // we need the ID to later edit
                 console.log(ctx.message_id);
                 // this may need to go into a per-user object???
-                messageToEdit = ctx.message_id;
                 // process the document by reading the file one another thread (potentially using fibers)
             })
         // get the file from telegram
@@ -94,10 +92,10 @@ detectScene.on('document', (ctx) => {
                         console.log(zeroWidthToString.default(results.toString()))
                         // this is currently bugging out and always reporting false for files??
                         if (zeroWidthCheck(results.toString()) == false) {
-                            return ctx.telegram.editMessageText(ctx.chat.id, messageToEdit, null, `Given file did not contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`);
+                            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `Given file did not contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`);
                         }
                         let stringFromZeroWidth = zeroWidthToString.default(results);
-                        return ctx.telegram.editMessageText(ctx.chat.id, messageToEdit, null, `String found by decoding zero-wdith characters: ${stringFromZeroWidth}\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`);
+                        return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `String found by decoding zero-wdith characters: ${stringFromZeroWidth}\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`);
                         // edit the main message with the results
                     })
                     .catch((err) => {
