@@ -13,14 +13,10 @@ const detectScene = new Scene('detect');
 detectScene.enter((ctxParent) => {
     // send the keyboard markup
     console.log(ctxParent);
-    // ctxParent.session.messageToEdit = 'fox';
     return ctxParent.reply('You are in detect mode now! use /back to leave, send a message or file to be processed.', detectKeyboard)
         .then((ctx) => {
-            // THIS IS THE MESSAGE WE EDIT FOR ALL REPLIES TO THE USER
-            console.log(ctx);
-            ctxParent.session.messageToEdit = ctx.message_id
-            console.log(ctxParent.session.messageToEdit)
-            // get the id of the message sent to later edit after user input is given (eventually)
+            // get the id of the message sent to later edit after user input is given
+            ctxParent.session.messageToEdit = ctx.message_id;
         })
 })
 
@@ -40,13 +36,13 @@ detectScene.action('exit', (ctx) => {
 detectScene.action('message', (ctx) => {
     // 'answer' the CB, making the loading icon go away
     ctx.answerCbQuery(ctx.callbackQuery.data);
-    ctx.reply('Send me a message to detect for zero-width characters!');
+    ctx.reply('Send me a copy-pasted set of text to check for zero-width characters!');
 });
 
 detectScene.action('file', (ctx) => {
     // 'answer' the CB, making the loading icon go away
     ctx.answerCbQuery(ctx.callbackQuery.data);
-    ctx.reply('Send me a file to detect for zero-width characters!');
+    ctx.reply('Send a file to check for zero-width characters!');
 });
 
 // on text, attempt a detect
@@ -72,9 +68,6 @@ detectScene.on('document', (ctx) => {
     if (ctx.message.document.file_name.includes('.txt') && ctx.message.document.mime_type == 'text/plain') {
         ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `Processing: ${ctx.message.document.file_name}`)
             .then((ctx) => {
-                // we need the ID to later edit
-                console.log(ctx.message_id);
-                // this may need to go into a per-user object???
                 // process the document by reading the file one another thread (potentially using fibers)
             })
         // get the file from telegram
@@ -89,13 +82,14 @@ detectScene.on('document', (ctx) => {
                     .then((results) => {
                         // this should be plain text that we can clean
                         // check for any zero-width characters
-                        console.log(zeroWidthToString.default(results.toString()))
+                        console.log(typeof results)
+                        console.log(zeroWidthToString.default(results));
                         // this is currently bugging out and always reporting false for files??
-                        if (zeroWidthCheck(results.toString()) == false) {
-                            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `Given file did not contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`);
+                        if (zeroWidthCheck(results) == false) {
+                            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `Given file did not contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`, detectKeyboard);
                         }
                         let stringFromZeroWidth = zeroWidthToString.default(results);
-                        return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `String found by decoding zero-wdith characters: ${stringFromZeroWidth}\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`);
+                        return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `String found by decoding zero-wdith characters: ${stringFromZeroWidth}\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`, detectKeyboard);
                         // edit the main message with the results
                     })
                     .catch((err) => {
@@ -145,7 +139,6 @@ function zeroWidthCheck(textToCheck: string) {
     } else {
         return true;
     }
-
 }
 
 export default detectScene;
