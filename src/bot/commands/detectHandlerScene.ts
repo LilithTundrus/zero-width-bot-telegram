@@ -83,9 +83,9 @@ detectScene.on('document', (ctx) => {
                             let stringFromZeroWidth = zeroWidthToString.default(results);
                             // edit the main message with the results
                             return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `Document contained zero-width characters. Attempted deocde of characters: ${stringFromZeroWidth}\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`, detectKeyboard);
+                        } else {
+                            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `Given file did NOT contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`, detectKeyboard);
                         }
-                        return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `Given file did NOT contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`, detectKeyboard);
-
                     })
                     .catch((err) => {
                         // let the user know something went wrong and send a message to the admin
