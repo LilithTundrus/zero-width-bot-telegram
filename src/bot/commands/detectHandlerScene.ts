@@ -50,13 +50,13 @@ detectScene.action('file', (ctx) => {
 detectScene.on('text', (ctx) => {
     let userMessage = ctx.message.text.trim();
     // if text is a command like 💊 Clean, go to that scene!!
+    // Do this for all base commands
     if (userMessage == '💊 Clean') {
         // leave the scene and enter the next
     }
     // Check if the message is has zero-wdith characters
     if (zeroWidthCheck(userMessage) == false) {
         // Message does not contain anything we can detect
-        // ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
         return ctx.reply(`Given message did not contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`);
     }
     let stringFromZeroWidth = zeroWidthToString.default(userMessage);
@@ -82,7 +82,6 @@ detectScene.on('document', (ctx) => {
                     .then((results) => {
                         // this should be plain text that we can clean
                         // check for any zero-width characters
-                        console.log(typeof results)
                         console.log(zeroWidthToString.default(results));
                         // this is currently bugging out and always reporting false for files??
                         if (zeroWidthCheck(results) == false) {
@@ -94,7 +93,7 @@ detectScene.on('document', (ctx) => {
                     })
                     .catch((err) => {
                         // let the user know something went wrong and send a message to the admin
-                        ctx.reply(`Looks like something went wrong with parsing your file. I've sent a ticket about the issue, please try again later!`)
+                        ctx.reply(`Looks like something went wrong with parsing your file. I've sent a ticket about the issue, please try again later!`);
                         ctx.telegram.sendMessage(adminID, err.toString());
                         return ctx.logger.error(err);
                     })
@@ -115,16 +114,12 @@ detectScene.on('document', (ctx) => {
 function requestUrl(url: string, userAgent: string): Promise<any> {
     let options = {
         uri: url,
-        headers: {
-            'User-Agent': userAgent
-        },
+        headers: { 'User-Agent': userAgent },
         json: true
     };
     return new Promise((resolve, reject) => {
         request.get(options, function (err: Error, response, body) {
-            if (err) {
-                return reject(err);
-            }
+            if (err) return reject(err);
             return resolve(body);
         })
     })
