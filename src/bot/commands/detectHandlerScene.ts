@@ -15,7 +15,7 @@ detectScene.enter((ctxParent) => {
         .then((ctx) => {
             // get the id of the message sent to later edit after user input is given
             ctxParent.session.messageToEdit = ctx.message_id;
-            ctxParent.session.lastSentMessage = 'You are in detect mode now! use /back or the exit button to leave. Send a message or file to be processed.';
+            ctxParent.session.lastSentMessage = 'You are in 🔍 Detect mode now! use /back or the exit button to leave. Send a message or file to be processed.';
         })
 })
 
