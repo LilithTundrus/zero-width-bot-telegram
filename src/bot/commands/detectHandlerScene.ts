@@ -50,7 +50,7 @@ detectScene.action('file', (ctx) => {
 detectScene.on('text', (ctx) => {
     let userMessage = ctx.message.text.trim();
     // if text is a command like 💊 Clean, go to that scene!!
-    // Do this for all base commands
+    // TODO: Do this for all base commands
     if (userMessage == '💊 Clean') {
         // leave the scene and enter the next
     }
@@ -67,10 +67,7 @@ detectScene.on('text', (ctx) => {
 detectScene.on('document', (ctx) => {
     if (ctx.message.document.file_name.includes('.txt') && ctx.message.document.mime_type == 'text/plain') {
         ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `Processing: ${ctx.message.document.file_name}`)
-            .then((ctx) => {
-                // process the document by reading the file one another thread (potentially using fibers)
-            })
-        // get the file from telegram
+        // process the document by reading the file  (potentially using fibers for threading)
         ctx.telegram.getFileLink(ctx.message.document.file_id)
             .then((link) => {
                 console.log(ctx.session.messageToEdit)
@@ -83,13 +80,12 @@ detectScene.on('document', (ctx) => {
                         // this should be plain text that we can clean
                         // check for any zero-width characters
                         console.log(zeroWidthToString.default(results));
-                        // this is currently bugging out and always reporting false for files??
                         if (zeroWidthCheck(results) == false) {
                             return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `Given file did not contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`, detectKeyboard);
                         }
                         let stringFromZeroWidth = zeroWidthToString.default(results);
-                        return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `String found by decoding zero-wdith characters: ${stringFromZeroWidth}\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`, detectKeyboard);
                         // edit the main message with the results
+                        return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `String found by decoding zero-wdith characters: ${stringFromZeroWidth}\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`, detectKeyboard);
                     })
                     .catch((err) => {
                         // let the user know something went wrong and send a message to the admin
