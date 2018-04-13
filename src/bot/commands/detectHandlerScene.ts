@@ -5,7 +5,6 @@ import Scene from 'telegraf/scenes/base';
 import * as request from 'request';
 import { detectKeyboard } from '../keyboardMarkups';
 import { adminID } from '../../config/config';
-
 const { enter, leave } = Stage;
 const detectScene = new Scene('detect');
 
@@ -76,16 +75,17 @@ detectScene.on('document', (ctx) => {
                 ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
                 // get the file using request (lazy, no downloading)
                 requestUrl(link, 'zero-width-bot-telegram-0.0.1')
-                    .then((results) => {
+                    .then((results: string) => {
                         // this should be plain text that we can clean
                         // check for any zero-width characters
                         console.log(zeroWidthToString.default(results));
-                        if (zeroWidthCheck(results) == false) {
-                            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `Given file did not contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`, detectKeyboard);
+                        if (zeroWidthCheck(results) == true) {
+                            let stringFromZeroWidth = zeroWidthToString.default(results);
+                            // edit the main message with the results
+                            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `Document contained zero-width characters. Attempted deocde of characters: ${stringFromZeroWidth}\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`, detectKeyboard);
                         }
-                        let stringFromZeroWidth = zeroWidthToString.default(results);
-                        // edit the main message with the results
-                        return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `String found by decoding zero-wdith characters: ${stringFromZeroWidth}\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`, detectKeyboard);
+                        return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `Given file did NOT contain zero-width characters\n\n**NOTE:** Please do not use this as an end-all for detecting zero-width tracking detection method!`, detectKeyboard);
+
                     })
                     .catch((err) => {
                         // let the user know something went wrong and send a message to the admin
