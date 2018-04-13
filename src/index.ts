@@ -16,9 +16,7 @@ import { Message } from 'telegram-typings';
 // #endregion
 
 // TODO: Handle messages that end up being over 2,048 characters
-// TODO: Figure out how to let users set an encode message 'container' and a desired message to hide
 // TODO: Handle groups vs. individual in the /start
-// TODO: Create a main menu!
 // TODO: This need quite a lot of housekeeping to stay user-friendly!!!!
 // TODO: Make sure this is using async and properly non-block threading
 
@@ -40,7 +38,7 @@ const limitConfig = {
     })
 };
 
-// Put middleware globally fo the bot here
+// Put middleware globally for the bot here
 bot.use(
     session(),
     rateLimit(limitConfig),
@@ -55,6 +53,7 @@ bot.use(
         return next();
     },
 );
+
 // setInterval(sendThreadingTestMessage, 1 * 500);
 
 // function sendThreadingTestMessage() {
@@ -81,7 +80,9 @@ bot.context.logger = logger;
 
 // Listen for any message sent to the bot (does not capture commands)
 bot.on('message', (ctx) => {
-    return ctx.logger.debug(`${ctx.message.from.username} sent ${ctx.message.text} at ${new Date().toTimeString()}`);
+    return ctx.logger.debug(
+        `${ctx.message.from.username} sent ${ctx.message.text} at ${new Date().toTimeString()}`
+    );
 });
 
 bot.catch((err) => {
