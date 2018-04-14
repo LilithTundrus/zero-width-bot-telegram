@@ -12,7 +12,7 @@ const encodeScene = new Scene('encode');
 
 // on the 'encode' command, a user is brought into a scene to craft a container and message
 encodeScene.enter((parentCtx) => {
-    return parentCtx.reply('You are in the encode command now! use /back to leave. use /c + message to set container message, use /m + message to set the hideen message. use /done to get your container with the hidden message.', encodeKeyboard)
+    return parentCtx.reply('You are in the encode command now! use /back to leave.', encodeKeyboard)
         .then((ctx) => {
             // get the id of the message sent to later edit after user input is given
             parentCtx.session.messageToEdit = ctx.message_id;
