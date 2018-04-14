@@ -27,6 +27,16 @@ const detectKeyboard = Extra.HTML()
             { columns: 2 })
     );
 
-
+const adminKeyboard = Extra.HTML()
+.markup((m) =>
+    m.inlineKeyboard([
+        m.callbackButton('ℹ️ Process Info', 'procinfo'),
+        m.callbackButton('🗒 Logs', 'logs'),
+        m.callbackButton('🔅 Restart bot', 'restart'),
+        m.callbackButton('📈 Stats', 'stats'),
+        m.callbackButton('❌ Exit', 'exit')
+    ],
+        { columns: 2 })
+);
 
 export { encodeKeyboard, mainMenuKeyboard, detectKeyboard }
