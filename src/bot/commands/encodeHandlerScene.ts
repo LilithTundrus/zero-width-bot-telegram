@@ -65,7 +65,7 @@ encodeScene.action('done', (ctx) => {
     else if (ctx.session.container == undefined) messageToSend = `⛔️ You are missing a 📁 Container`;
     else if (ctx.session.message == undefined) messageToSend = `⛔️ You are missing a ✉️ Message`;
     else {
-        messageToSend = `✅ Below is your message!`;
+        messageToSend = `✅ Below is your encoded message!`;
         // send the user their message
     }
     // 'answer' the CB, making the loading icon go away
@@ -74,10 +74,8 @@ encodeScene.action('done', (ctx) => {
         ctx.session.lastSentMessage = messageToSend;
         return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, encodeKeyboard).
             then(() => {
-                // TODO: figure out why this is never sending!!
-                if (ctx.session.message !== undefined && ctx.session.container == !undefined) {
-                    // return ctx.reply(`${ctx.session.container}${stringToZeroWidth.default(ctx.session.message)}`);
-                    return ctx.reply('AAA')
+                if (ctx.session.message !== undefined && ctx.session.container !== undefined) {
+                    return ctx.reply(`${ctx.session.container}${stringToZeroWidth.default(ctx.session.message)}`);
                 }
             })
     }
