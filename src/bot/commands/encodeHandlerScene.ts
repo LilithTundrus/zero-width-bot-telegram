@@ -6,8 +6,6 @@ import { encodeKeyboard } from '../keyboardMarkups';
 const { enter, leave } = Stage;
 const encodeScene = new Scene('encode');
 
-// this is probably the absolute worst way to do this
-
 // on the 'encode' command, a user is brought into a scene to craft a container and message
 encodeScene.enter((parentCtx) => {
     return parentCtx.reply('You are in the encode command now! use /back to leave. use /c + message to set container message, use /m + message to set the hideen message. use /done to get your container with the hidden message.', encodeKeyboard)
@@ -85,8 +83,7 @@ encodeScene.action('done', (ctx) => {
 // on text, attempt an encode action from session or scene change
 encodeScene.on('text', (ctx) => {
     let userMessage = ctx.message.text.trim();
-    // if text is a command like 💊 Clean, go to that scene!!
-    // TODO: Do this for all base commands
+    // if text is a command, go to that scene!!
     if (userMessage == '💊 Clean') {
         // leave the scene and enter the next
         return ctx.scene.leave().then(() => {
@@ -115,7 +112,7 @@ encodeScene.on('text', (ctx) => {
         ctx.session.message = ctx.message.text;
     } else if (ctx.session.state == 'container') {
         console.log(ctx.session.state)
-        // the text they sent will be the message to encode
+        // the text they sent will be the container
         ctx.session.container = ctx.message.text;
     }
 });

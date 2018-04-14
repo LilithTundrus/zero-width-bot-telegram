@@ -61,8 +61,7 @@ detectScene.action('file', (ctx) => {
 // on text, attempt a detect or scene change
 detectScene.on('text', (ctx) => {
     let userMessage = ctx.message.text.trim();
-    // if text is a command like 💊 Clean, go to that scene!!
-    // TODO: Do this for all base commands
+    // if text is a command, go to that scene!!
     if (userMessage == '💊 Clean') {
         // leave the scene and enter the next
         return ctx.scene.leave().then(() => {
