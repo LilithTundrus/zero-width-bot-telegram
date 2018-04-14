@@ -16,7 +16,7 @@ encodeScene.enter((parentCtx) => {
         .then((ctx) => {
             // get the id of the message sent to later edit after user input is given
             parentCtx.session.messageToEdit = ctx.message_id;
-            parentCtx.session.lastSentMessage = 'You are in 🔍 Detect mode now! use /back or the exit button to leave. Send a message or file to be processed.';
+            parentCtx.session.lastSentMessage = 'You are in ✉️ Encode mode now! use /back or the exit button to leave. Send a message or file to be processed.';
         })
 })
 
