@@ -5,6 +5,7 @@ import { adminID } from '../../config/config';
 import { encodeKeyboard } from '../keyboardMarkups';
 import { isNullOrUndefined } from 'util';
 import { requestUrl } from '../../lib/request';
+import * as fs from 'fs';
 
 const { enter, leave } = Stage;
 const encodeScene = new Scene('encode');
@@ -23,6 +24,12 @@ encodeScene.leave((parentCtx) => {
     parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, 'ℹ️ You just left the encode command, all base commands are now available using /menu!')
         .then(() => {
             // Remove the temp vars, allow for garbage collection
+            fs.unlink(`../temp/target${parentCtx.chat.id}.txt`, function (error) {
+                if (error) {
+                    throw error;
+                }
+                console.log('Deleted user temp file');
+            });
             parentCtx.session.container = null;
             parentCtx.session.message = null;
             return parentCtx.session.messageToEdit = null;
@@ -134,9 +141,21 @@ encodeScene.on('document', (ctx) => {
                     .then((results: string) => {
                         // get the file, find a space, append the zero-width message there, if no spaces just append the zero-width message
                         // write this to a file (temp folder maybe???) 
-
-                        // debugging
-                        ctx.reply(results)
+                        return fs.writeFile(`../temp/target${ctx.chat.id}.txt`, results, (err) => {
+                            if (err) {
+                                throw err;
+                            }
+                            console.log('File saved!');
+                        });
+                    })
+                    .then(() => {
+                        // fs.readFile(`../temp/target${ctx.chat.id}.txt`, (err, data) => {
+                        //     if (err) {
+                        //         throw err;
+                        //     }
+                        //     console.log(data.toString());
+                        // });
+                        // send the file through telegram
                     })
                     .catch((err) => {
                         // let the user know something went wrong and send a message to the admin
@@ -161,6 +180,5 @@ encodeScene.on('document', (ctx) => {
         }
     }
 });
-
 
 export default encodeScene;
