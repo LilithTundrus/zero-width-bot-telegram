@@ -2,7 +2,7 @@ const Extra = require('telegraf/extra');
 const Markup = require('telegraf/markup')
 
 
-const messageKeyboard = Extra.HTML().markup((m) =>
+const encodeKeyboard = Extra.HTML().markup((m) =>
     m.inlineKeyboard([
         m.callbackButton('✉️ Set Message', 'message'),
         m.callbackButton('📁 Set Container', 'container'),
@@ -29,4 +29,4 @@ const detectKeyboard = Extra.HTML()
 
 
 
-export { messageKeyboard, mainMenuKeyboard, detectKeyboard }
+export { encodeKeyboard, mainMenuKeyboard, detectKeyboard }

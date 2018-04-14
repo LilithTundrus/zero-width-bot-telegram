@@ -28,13 +28,14 @@ composer.use(
 composer.command('start', startHandler);
 composer.command('menu', menuHandler);
 composer.command('procinfo', processinfoHandler);
-composer.command('encode', encodeHandler);
 composer.command('decode', decodeHandler);
-composer.command('encodenew', enter('encode'));
+composer.command('encode', enter('encode'));
 composer.command('detect', enter('detect'));
 
 
 // listen for specific commands from the main menu
 composer.hears('🔍 Detect', enter('detect'));
+composer.hears('✉️ Encode', enter('encode'));
+
 
 export = composer;
