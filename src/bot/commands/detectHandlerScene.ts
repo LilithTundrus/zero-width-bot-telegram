@@ -21,17 +21,12 @@ detectScene.enter((parentCtx) => {
 
 detectScene.leave((parentCtx) => {
     parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, 'ℹ️ You just left the detect command, all base commands are now available using /menu!')
-        .then(() => {
-            // Remove the temp var, allow for garbage collection
-            //return parentCtx.session.messageToEdit = null;
-        })
 });
 
 detectScene.command('back', leave());
 detectScene.command('menu', leave());
 
 // Listen for an exit callback
-// TODO: DELETE any messages sent using a scene cleanup set of code
 detectScene.action('exit', (ctx) => {
     // 'answer' the CB, making the loading icon go away
     ctx.answerCbQuery(ctx.callbackQuery.data);

@@ -35,7 +35,6 @@ encodeScene.leave((parentCtx) => {
             // Remove the temp vars, allow for garbage collection
             parentCtx.session.container = null;
             parentCtx.session.message = null;
-            //return parentCtx.session.messageToEdit = null;
         })
 });
 
@@ -91,6 +90,16 @@ encodeScene.action('done', (ctx) => {
                     return ctx.reply(`${ctx.session.container}${stringToZeroWidth.default(ctx.session.message)}`);
                 }
             })
+    }
+});
+
+encodeScene.action('file', (ctx) => {
+    let messageToSend = 'ℹ️ Send a file to check encode!';
+    // 'answer' the CB, making the loading icon go away
+    ctx.answerCbQuery(ctx.callbackQuery.data);
+    if (ctx.session.lastSentMessage !== messageToSend) {
+        ctx.session.lastSentMessage = messageToSend;
+        return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, encodeKeyboard);
     }
 });
 
