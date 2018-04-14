@@ -66,3 +66,4 @@ src/config/**
 logs/**
 build/**
 config.**
+temp/**
