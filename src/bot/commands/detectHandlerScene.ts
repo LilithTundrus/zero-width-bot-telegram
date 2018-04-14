@@ -23,7 +23,7 @@ detectScene.leave((parentCtx) => {
     parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, 'ℹ️ You just left the detect command, all base commands are now available using /menu!')
         .then(() => {
             // Remove the temp var, allow for garbage collection
-            return parentCtx.session.messageToEdit = null;
+            //return parentCtx.session.messageToEdit = null;
         })
 });
 

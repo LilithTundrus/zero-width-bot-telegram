@@ -23,16 +23,19 @@ encodeScene.enter((parentCtx) => {
 encodeScene.leave((parentCtx) => {
     parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, 'ℹ️ You just left the encode command, all base commands are now available using /menu!')
         .then(() => {
+            // check if they have a temp file
+            if (fs.existsSync(`../temp/target${parentCtx.chat.id}.txt`)) {
+                fs.unlink(`../temp/target${parentCtx.chat.id}.txt`, function (error) {
+                    if (error) {
+                        throw error;
+                    }
+                    console.log('Deleted user temp file');
+                });
+            }
             // Remove the temp vars, allow for garbage collection
-            fs.unlink(`../temp/target${parentCtx.chat.id}.txt`, function (error) {
-                if (error) {
-                    throw error;
-                }
-                console.log('Deleted user temp file');
-            });
             parentCtx.session.container = null;
             parentCtx.session.message = null;
-            return parentCtx.session.messageToEdit = null;
+            //return parentCtx.session.messageToEdit = null;
         })
 });
 
