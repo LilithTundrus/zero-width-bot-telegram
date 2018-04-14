@@ -2,9 +2,9 @@
 import * as zeroWidthToString from '../../lib/zeroWidthToString';
 import Stage from 'telegraf/stage';
 import Scene from 'telegraf/scenes/base';
-import * as request from 'request';
 import { detectKeyboard } from '../keyboardMarkups';
 import { adminID } from '../../config/config';
+import { requestUrl } from '../../lib/request';
 const { enter, leave } = Stage;
 const detectScene = new Scene('detect');
 
@@ -149,25 +149,6 @@ detectScene.on('document', (ctx) => {
         }
     }
 })
-
-/**
- * Request an e621 URL using constant headers (user-agent, etc.)
- * @param {URL} url 
- * @returns {Promise<any>}
- */
-function requestUrl(url: string, userAgent: string): Promise<any> {
-    let options = {
-        uri: url,
-        headers: { 'User-Agent': userAgent },
-        json: true
-    };
-    return new Promise((resolve, reject) => {
-        request.get(options, function (err: Error, response, body) {
-            if (err) return reject(err);
-            return resolve(body);
-        })
-    })
-}
 
 function zeroWidthCheck(textToCheck: string) {
     let stringFromZeroWidth = zeroWidthToString.default(textToCheck);
