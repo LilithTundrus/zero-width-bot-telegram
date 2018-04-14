@@ -127,8 +127,15 @@ encodeScene.on('text', (ctx) => {
 });
 
 encodeScene.on('document', (ctx) => {
-    // Make sure a user has set a message before accepting files
+    if (!ctx.session.message) {
+        let messageToSend = `⛔️ You need to set a ✉️ Message to encode into the document!`;
+        if (ctx.session.lastSentMessage !== messageToSend) {
+            ctx.session.lastSentMessage = messageToSend;
+            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, encodeKeyboard);
+        }
+    }
     if (ctx.message.document.file_name.includes('.txt') && ctx.message.document.mime_type == 'text/plain') {
+        // TODO: record the filename to a var to user later down below!!!
         ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `🕑 Processing: ${ctx.message.document.file_name} ...`);
         // process the document by reading the file  (potentially using fibers for threading)
         ctx.telegram.getFileLink(ctx.message.document.file_id)
@@ -140,8 +147,7 @@ encodeScene.on('document', (ctx) => {
                 requestUrl(link, 'zero-width-bot-telegram-0.0.1')
                     .then((results: string) => {
                         // get the file, find a space, append the zero-width message there, if no spaces just append the zero-width message
-                        // write this to a file (temp folder maybe???) 
-                        return fs.writeFile(`../temp/target${ctx.chat.id}.txt`, results, (err) => {
+                        return fs.writeFile(`../temp/target${ctx.chat.id}.txt`, `${results}${stringToZeroWidth.default(ctx.session.message)}`, (err) => {
                             if (err) {
                                 throw err;
                             }
@@ -149,13 +155,11 @@ encodeScene.on('document', (ctx) => {
                         });
                     })
                     .then(() => {
-                        // fs.readFile(`../temp/target${ctx.chat.id}.txt`, (err, data) => {
-                        //     if (err) {
-                        //         throw err;
-                        //     }
-                        //     console.log(data.toString());
-                        // });
-                        // send the file through telegram
+                        // reset the message and send the document
+                        ctx.replyWithDocument({
+                            source: fs.createReadStream(`../temp/target${ctx.chat.id}.txt`),
+                            filename: `target${ctx.chat.id}.txt`
+                        })
                     })
                     .catch((err) => {
                         // let the user know something went wrong and send a message to the admin
