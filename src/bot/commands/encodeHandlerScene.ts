@@ -2,6 +2,7 @@ import * as stringToZeroWidth from '../../lib/stringToZeroWidth';
 import Stage from 'telegraf/stage';
 import Scene from 'telegraf/scenes/base';
 import { encodeKeyboard } from '../keyboardMarkups';
+import { isNullOrUndefined } from 'util';
 
 const { enter, leave } = Stage;
 const encodeScene = new Scene('encode');
@@ -19,7 +20,9 @@ encodeScene.enter((parentCtx) => {
 encodeScene.leave((parentCtx) => {
     parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, 'ℹ️ You just left the encode command, all base commands are now available using /menu!')
         .then(() => {
-            // Remove the temp var, allow for garbage collection
+            // Remove the temp vars, allow for garbage collection
+            parentCtx.session.container = null;
+            parentCtx.session.message = null;
             return parentCtx.session.messageToEdit = null;
         })
 });
@@ -72,13 +75,12 @@ encodeScene.action('done', (ctx) => {
         ctx.session.lastSentMessage = messageToSend;
         return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, encodeKeyboard).
             then(() => {
-                if (ctx.session.message !== undefined && ctx.session.container !== undefined) {
+                if (ctx.session.message && ctx.session.container) {
                     return ctx.reply(`${ctx.session.container}${stringToZeroWidth.default(ctx.session.message)}`);
                 }
             })
     }
 });
-
 
 // on text, attempt an encode action from session or scene change
 encodeScene.on('text', (ctx) => {
