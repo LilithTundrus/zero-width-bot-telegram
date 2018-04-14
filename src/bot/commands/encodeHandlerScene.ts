@@ -38,7 +38,7 @@ encodeScene.action('exit', (ctx) => {
 });
 
 encodeScene.action('message', (ctx) => {
-    let messageToSend = 'ℹ️ Send a message  to encode into your container!';
+    let messageToSend = 'ℹ️ Send a message to encode into your container!';
     // 'answer' the CB, making the loading icon go away
     ctx.answerCbQuery(ctx.callbackQuery.data);
     ctx.session.state = 'message';
@@ -47,6 +47,42 @@ encodeScene.action('message', (ctx) => {
         return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, encodeKeyboard);
     }
 });
+
+encodeScene.action('container', (ctx) => {
+    let messageToSend = 'ℹ️ Send a container to hide your message in!';
+    // 'answer' the CB, making the loading icon go away
+    ctx.answerCbQuery(ctx.callbackQuery.data);
+    ctx.session.state = 'container';
+    if (ctx.session.lastSentMessage !== messageToSend) {
+        ctx.session.lastSentMessage = messageToSend;
+        return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, encodeKeyboard);
+    }
+});
+
+encodeScene.action('done', (ctx) => {
+    let messageToSend = '🕑 Creating your encoded message....';
+    if (ctx.session.message == undefined && ctx.session.container == undefined) messageToSend = `⛔️ You must first set a ✉️ Message and a 📁 Container`;
+    else if (ctx.session.container == undefined) messageToSend = `⛔️ You are missing a 📁 Container`;
+    else if (ctx.session.message == undefined) messageToSend = `⛔️ You are missing a ✉️ Message`;
+    else {
+        messageToSend = `✅ Below is your message!`;
+        // send the user their message
+    }
+    // 'answer' the CB, making the loading icon go away
+    ctx.answerCbQuery(ctx.callbackQuery.data);
+    if (ctx.session.lastSentMessage !== messageToSend) {
+        ctx.session.lastSentMessage = messageToSend;
+        return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, encodeKeyboard).
+            then(() => {
+                // TODO: figure out why this is never sending!!
+                if (ctx.session.message !== undefined && ctx.session.container == !undefined) {
+                    // return ctx.reply(`${ctx.session.container}${stringToZeroWidth.default(ctx.session.message)}`);
+                    return ctx.reply('AAA')
+                }
+            })
+    }
+});
+
 
 // on text, attempt an encode action from session or scene change
 encodeScene.on('text', (ctx) => {
@@ -74,7 +110,16 @@ encodeScene.on('text', (ctx) => {
             return ctx.scene.enter('detect');
         });
     }
-    console.log(ctx.session.state);
+    // check the session state to figure out what to assign the text to
+    if (ctx.session.state == 'message') {
+        console.log(ctx.session.state)
+        // the text they sent will be the message to encode
+        ctx.session.message = ctx.message.text;
+    } else if (ctx.session.state == 'container') {
+        console.log(ctx.session.state)
+        // the text they sent will be the message to encode
+        ctx.session.container = ctx.message.text;
+    }
 });
 
 export default encodeScene;
