@@ -27,6 +27,15 @@ const detectKeyboard = Extra.HTML()
             { columns: 2 })
     );
 
+const decodeKeyboard = Extra.HTML()
+.markup((m) =>
+    m.inlineKeyboard([
+        m.callbackButton('✉️ Deocde From Message', 'message'),
+        m.callbackButton('📄 Deocde From File', 'file'),
+        m.callbackButton('❌ Exit', 'exit')],
+        { columns: 2 })
+);
+
 const adminKeyboard = Extra.HTML()
 .markup((m) =>
     m.inlineKeyboard([
@@ -39,4 +48,4 @@ const adminKeyboard = Extra.HTML()
         { columns: 2 })
 );
 
-export { encodeKeyboard, mainMenuKeyboard, detectKeyboard }
+export { encodeKeyboard, mainMenuKeyboard, detectKeyboard, decodeKeyboard }
