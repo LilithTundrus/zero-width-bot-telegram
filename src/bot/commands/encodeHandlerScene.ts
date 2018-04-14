@@ -1,8 +1,10 @@
 import * as stringToZeroWidth from '../../lib/stringToZeroWidth';
 import Stage from 'telegraf/stage';
 import Scene from 'telegraf/scenes/base';
+import { adminID } from '../../config/config';
 import { encodeKeyboard } from '../keyboardMarkups';
 import { isNullOrUndefined } from 'util';
+import { requestUrl } from '../../lib/request';
 
 const { enter, leave } = Stage;
 const encodeScene = new Scene('encode');
@@ -109,14 +111,56 @@ encodeScene.on('text', (ctx) => {
     }
     // check the session state to figure out what to assign the text to
     if (ctx.session.state == 'message') {
-        console.log(ctx.session.state)
         // the text they sent will be the message to encode
         ctx.session.message = ctx.message.text;
     } else if (ctx.session.state == 'container') {
-        console.log(ctx.session.state)
         // the text they sent will be the container
         ctx.session.container = ctx.message.text;
     }
 });
+
+encodeScene.on('document', (ctx) => {
+    // Make sure a user has set a message before accepting files
+    if (ctx.message.document.file_name.includes('.txt') && ctx.message.document.mime_type == 'text/plain') {
+        ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `🕑 Processing: ${ctx.message.document.file_name} ...`);
+        // process the document by reading the file  (potentially using fibers for threading)
+        ctx.telegram.getFileLink(ctx.message.document.file_id)
+            .then((link) => {
+                // link to download the file
+                console.log(link);
+                ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
+                // get the file using request (lazy, no downloading)
+                requestUrl(link, 'zero-width-bot-telegram-0.0.1')
+                    .then((results: string) => {
+                        // get the file, find a space, append the zero-width message there, if no spaces just append the zero-width message
+                        // write this to a file (temp folder maybe???) 
+
+                        // debugging
+                        ctx.reply(results)
+                    })
+                    .catch((err) => {
+                        // let the user know something went wrong and send a message to the admin
+                        ctx.reply(`⛔️ Looks like something went wrong with parsing your file. I've sent a ticket about the issue, please try again later!`);
+                        ctx.scene.leave();
+                        ctx.telegram.sendMessage(adminID, err.toString());
+                        return ctx.logger.error(err);
+                    })
+            })
+        // check file size (should be under 16k)
+    } else if (ctx.message.document.file_size > 16000) {
+        let messageToSend = `⛔️ Please send a file in text format under 16k`;
+        if (ctx.session.lastSentMessage !== messageToSend) {
+            ctx.session.lastSentMessage = messageToSend;
+            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, encodeKeyboard);
+        }
+    } else {
+        let messageToSend = `⛔️ Please send a file in .txt format`;
+        if (ctx.session.lastSentMessage !== messageToSend) {
+            ctx.session.lastSentMessage = messageToSend;
+            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, encodeKeyboard);
+        }
+    }
+});
+
 
 export default encodeScene;
