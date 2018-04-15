@@ -107,7 +107,7 @@ detectScene.on('document', (ctx) => {
                 console.log(link);
                 ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
                 // get the file using request (lazy, no downloading)
-                requestUrl(link, 'zero-width-bot-telegram-0.0.1')
+                requestUrl(link, 'zero-width-bot-telegram-0.1.0')
                     .then((results: string) => {
                         // check for any zero-width characters
                         console.log(zeroWidthToString.default(results));

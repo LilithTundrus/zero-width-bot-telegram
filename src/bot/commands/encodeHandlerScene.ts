@@ -7,8 +7,6 @@ import { isNullOrUndefined } from 'util';
 import { requestUrl } from '../../lib/request';
 import * as fs from 'fs';
 
-// TODO: Figure out why the missing container message can sometimes appear when the container is NOT missing
-
 const { enter, leave } = Stage;
 const encodeScene = new Scene('encode');
 
@@ -44,7 +42,6 @@ encodeScene.command('back', leave());
 encodeScene.command('menu', leave());
 
 // Listen for an exit callback
-// TODO: DELETE any messages sent using a scene cleanup set of code
 encodeScene.action('exit', (ctx) => {
     // 'answer' the CB, making the loading icon go away
     ctx.answerCbQuery(ctx.callbackQuery.data);
@@ -158,7 +155,7 @@ encodeScene.on('document', (ctx) => {
                 console.log(link);
                 ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
                 // get the file using request (lazy, no downloading)
-                requestUrl(link, 'zero-width-bot-telegram-0.0.1')
+                requestUrl(link, 'zero-width-bot-telegram-0.1.0')
                     .then((results: string) => {
                         // get the file, find a space, append the zero-width message there, if no spaces just append the zero-width message
                         return fs.writeFile(`../temp/target${ctx.chat.id}.txt`, `${results}${stringToZeroWidth.default(ctx.session.message)}`, (err) => {

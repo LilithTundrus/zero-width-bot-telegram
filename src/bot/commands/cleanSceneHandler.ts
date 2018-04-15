@@ -27,7 +27,6 @@ cleanScene.command('back', leave());
 cleanScene.command('menu', leave());
 
 // Listen for an exit callback
-// TODO: DELETE any messages sent using a scene cleanup set of code
 cleanScene.action('exit', (ctx) => {
     // 'answer' the CB, making the loading icon go away
     ctx.answerCbQuery(ctx.callbackQuery.data);

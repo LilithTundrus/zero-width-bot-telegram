@@ -26,7 +26,6 @@ decodeScene.command('back', leave());
 decodeScene.command('menu', leave());
 
 // Listen for an exit callback
-// TODO: DELETE any messages sent using a scene cleanup set of code
 decodeScene.action('exit', (ctx) => {
     // 'answer' the CB, making the loading icon go away
     ctx.answerCbQuery(ctx.callbackQuery.data);
@@ -107,7 +106,7 @@ decodeScene.on('document', (ctx) => {
                 console.log(link);
                 ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
                 // get the file using request (lazy, no downloading)
-                requestUrl(link, 'zero-width-bot-telegram-0.0.1')
+                requestUrl(link, 'zero-width-bot-telegram-0.1.0')
                     .then((results: string) => {
                         // check for any zero-width characters
                         console.log(zeroWidthToString.default(results));
