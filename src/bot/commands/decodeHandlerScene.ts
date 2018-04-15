@@ -33,6 +33,5 @@ decodeScene.action('exit', (ctx) => {
     return ctx.scene.leave();
 });
 
-
 export default decodeScene;
 

@@ -17,7 +17,6 @@ import { Message } from 'telegram-typings';
 
 // TODO: Handle messages that end up being over 2,048 characters
 // TODO: Handle groups vs. individual in the /start
-// TODO: This need quite a lot of housekeeping to stay user-friendly!!!!
 // TODO: Make sure this is using async and properly non-block threading
 
 /* 
