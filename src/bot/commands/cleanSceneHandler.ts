@@ -6,6 +6,8 @@ import Scene from 'telegraf/scenes/base';
 import { cleanKeyboard } from '../keyboardMarkups';
 import { adminID } from '../../config/config';
 import { requestUrl } from '../../lib/request';
+import * as fs from 'fs';
+
 const { enter, leave } = Stage;
 const cleanScene = new Scene('clean');
 
@@ -105,6 +107,64 @@ cleanScene.on('text', (ctx) => {
         }
     }
 })
+
+cleanScene.on('document', (ctx) => {
+    if (ctx.message.document.file_name.includes('.txt') && ctx.message.document.mime_type == 'text/plain') {
+        // TODO: record the filename to a var to user later down below!!!
+        ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `🕑 Processing: ${ctx.message.document.file_name} ...`);
+        // process the document by reading the file  (potentially using fibers for threading)
+        ctx.telegram.getFileLink(ctx.message.document.file_id)
+            .then((link) => {
+                // link to download the file
+                console.log(link);
+                ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
+                // get the file using request (lazy, no downloading)
+                requestUrl(link, 'zero-width-bot-telegram-0.1.0')
+                    .then((results: string) => {
+                        let fixedString = results.split('').filter(function (char) {
+                            if (char == "﻿" || /* <feff> */
+                                char == "​" || /* <200b> */
+                                char == "‌" || /* <200c> */
+                                char == "‍"    /* <200d> */) {
+                                return false;
+                            }
+                            return true;
+                        }).join('');
+                        // get the file, find a space, append the zero-width message there, if no spaces just append the zero-width message
+                        fs.writeFile(`../temp/clean${ctx.chat.id}.txt`, `${fixedString}`, (err) => {
+                            if (err) {
+                                throw err;
+                            }
+                            console.log('File saved!');
+                            ctx.replyWithDocument({
+                                source: fs.createReadStream(`../temp/clean${ctx.chat.id}.txt`),
+                                filename: `clean${ctx.chat.id}.txt`
+                            })
+                        });
+                    })
+                    .catch((err) => {
+                        // let the user know something went wrong and send a message to the admin
+                        ctx.reply(`⛔️ Looks like something went wrong with parsing your file. I've sent a ticket about the issue, please try again later!`);
+                        ctx.scene.leave();
+                        ctx.telegram.sendMessage(adminID, err.toString());
+                        return ctx.logger.error(err);
+                    })
+            })
+        // check file size (should be under 16k)
+    } else if (ctx.message.document.file_size > 16000) {
+        let messageToSend = `⛔️ Please send a file in text format under 16k`;
+        if (ctx.session.lastSentMessage !== messageToSend) {
+            ctx.session.lastSentMessage = messageToSend;
+            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, cleanKeyboard);
+        }
+    } else {
+        let messageToSend = `⛔️ Please send a file in .txt format`;
+        if (ctx.session.lastSentMessage !== messageToSend) {
+            ctx.session.lastSentMessage = messageToSend;
+            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, cleanKeyboard);
+        }
+    }
+});
 
 function zeroWidthCheck(textToCheck: string) {
     let stringFromZeroWidth = zeroWidthToString(textToCheck);
