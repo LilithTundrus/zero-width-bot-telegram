@@ -152,8 +152,6 @@ encodeScene.on('document', (ctx) => {
         // process the document by reading the file  (potentially using fibers for threading)
         ctx.telegram.getFileLink(ctx.message.document.file_id)
             .then((link) => {
-                // link to download the file
-                console.log(link);
                 ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
                 // get the file using request (lazy, no downloading)
                 requestUrl(link, 'zero-width-bot-telegram-0.1.0')
@@ -164,14 +162,13 @@ encodeScene.on('document', (ctx) => {
                                 throw err;
                             }
                             console.log('File saved!');
+                            ctx.replyWithDocument({
+                                source: fs.createReadStream(`../temp/target${ctx.chat.id}.txt`),
+                                filename: `target${ctx.chat.id}.txt`
+                            })
+                            let messageToSend = `✅ Document successfully encoded!`;
+                            return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, encodeKeyboard);
                         });
-                    })
-                    .then(() => {
-                        // reset the message and send the document
-                        ctx.replyWithDocument({
-                            source: fs.createReadStream(`../temp/target${ctx.chat.id}.txt`),
-                            filename: `target${ctx.chat.id}.txt`
-                        })
                     })
                     .catch((err) => {
                         // let the user know something went wrong and send a message to the admin
