@@ -3,7 +3,6 @@ import Stage from 'telegraf/stage';
 import Scene from 'telegraf/scenes/base';
 import { adminID } from '../../config/config';
 import { encodeKeyboard } from '../keyboardMarkups';
-import { isNullOrUndefined } from 'util';
 import { requestUrl } from '../../lib/request';
 import * as fs from 'fs';
 

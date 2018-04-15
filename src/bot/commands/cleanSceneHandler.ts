@@ -140,6 +140,11 @@ cleanScene.on('document', (ctx) => {
                                 source: fs.createReadStream(`../temp/clean${ctx.chat.id}.txt`),
                                 filename: `clean${ctx.chat.id}.txt`
                             })
+                            let messageToSend = `✅ Your file is below, make sure that the file size is lowe than before if you suspect zero-width characters were in use`;
+                            if (ctx.session.lastSentMessage !== messageToSend) {
+                                ctx.session.lastSentMessage = messageToSend;
+                                return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, cleanKeyboard);
+                            }
                         });
                     })
                     .catch((err) => {
