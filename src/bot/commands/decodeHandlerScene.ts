@@ -8,7 +8,7 @@ import { requestUrl } from '../../lib/request';
 const { enter, leave } = Stage;
 const decodeScene = new Scene('decode');
 
-// on the 'decode' command, a user is brought into a scene to craft a container and message
+// on the 'decode' command, a user is brought into a scene to decode a document or message
 decodeScene.enter((parentCtx) => {
     return parentCtx.reply('You are in 📨 Decode mode now! use /back or the exit button to leave. Send a message or file to be processed.', decodeKeyboard)
         .then((ctx) => {

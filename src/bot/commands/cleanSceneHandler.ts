@@ -9,7 +9,7 @@ import { requestUrl } from '../../lib/request';
 const { enter, leave } = Stage;
 const cleanScene = new Scene('clean');
 
-// on the 'clean' command, a user is brought into a scene to craft a container and message
+// on the 'clean' command, a user is brought into a scene to clean a message or document
 cleanScene.enter((parentCtx) => {
     return parentCtx.reply('You are in 💊 Clean mode now! use /back or the exit button to leave. Send a message or file to be processed.', cleanKeyboard)
         .then((ctx) => {
@@ -54,7 +54,7 @@ cleanScene.action('file', (ctx) => {
     }
 });
 
-// on text, attempt a decode or scene change
+// on text, attempt a clean or scene change
 cleanScene.on('text', (ctx) => {
     let userMessage = ctx.message.text.trim();
     // if text is a command, go to that scene!!
@@ -82,23 +82,23 @@ cleanScene.on('text', (ctx) => {
     // Check if the message has zero-wdith characters
     if (zeroWidthCheck(userMessage) == false) {
         // Message does not contain anything we can detect
-        let messageToSend = `⚠️ Given message did NOT contain zero-width characters`;
+        let messageToSend = `✅ Given message did NOT contain zero-width characters`;
         if (ctx.session.lastSentMessage !== messageToSend) {
             ctx.session.lastSentMessage = messageToSend;
             return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, cleanKeyboard);
         }
     } else {
         let stringFromZeroWidth = zeroWidthToString(userMessage);
-        let fixedString = userMessage.split('').filter(function(char) {
+        // awful but it works
+        let fixedString = userMessage.split('').filter(function (char) {
             if (char == "﻿" || /* <feff> */
                 char == "​" || /* <200b> */
                 char == "‌" || /* <200c> */
-                char == "‍"    /* <200d> */
-              ) {
-              return false;
+                char == "‍"    /* <200d> */) {
+                return false;
             }
             return true;
-          }).join('');
+        }).join('');
         let messageToSend = `✅ String with zero-wdith characters removed: ${fixedString}`;
         if (ctx.session.lastSentMessage !== messageToSend) {
             ctx.session.lastSentMessage = messageToSend;
