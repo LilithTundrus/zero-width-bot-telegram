@@ -7,6 +7,8 @@ import { isNullOrUndefined } from 'util';
 import { requestUrl } from '../../lib/request';
 import * as fs from 'fs';
 
+// TODO: Figure out why the missing container message can sometimes appear when the container is NOT missing
+
 const { enter, leave } = Stage;
 const encodeScene = new Scene('encode');
 
@@ -74,8 +76,8 @@ encodeScene.action('container', (ctx) => {
 encodeScene.action('done', (ctx) => {
     let messageToSend = '🕑 Creating your encoded message....';
     if (ctx.session.message == undefined && ctx.session.container == undefined) messageToSend = `⛔️ You must first set a ✉️ Message and a 📁 Container`;
-    else if (ctx.session.container == undefined) messageToSend = `⛔️ You are missing a 📁 Container`;
-    else if (ctx.session.message == undefined) messageToSend = `⛔️ You are missing a ✉️ Message`;
+    else if (!ctx.session.container) messageToSend = `⛔️ You are missing a 📁 Container`;
+    else if (!ctx.session.message) messageToSend = `⛔️ You are missing a ✉️ Message`;
     else {
         messageToSend = `✅ Below is your encoded message!`;
         // send the user their message
