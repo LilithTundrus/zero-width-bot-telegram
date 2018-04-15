@@ -82,10 +82,12 @@ encodeScene.action('done', (ctx) => {
     ctx.answerCbQuery(ctx.callbackQuery.data);
     if (ctx.session.lastSentMessage !== messageToSend) {
         ctx.session.lastSentMessage = messageToSend;
-        return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, encodeKeyboard).
-            then(() => {
+        return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, encodeKeyboard)
+            .then(() => {
                 if (ctx.session.message && ctx.session.container) {
-                    return ctx.reply(`${ctx.session.container}${stringToZeroWidth.default(ctx.session.message)}`);
+                    let encodedMessage = `${ctx.session.container}${stringToZeroWidth.default(ctx.session.message)}`;
+                    if (encodedMessage.length > 2000) encodedMessage = `⛔️ Sorry, the encoded text was too long to send. Try encoding a smaller message or encode using the 📄 Encode File option`;
+                    return ctx.reply(encodedMessage);
                 }
             })
     }

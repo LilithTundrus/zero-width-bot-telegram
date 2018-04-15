@@ -88,6 +88,7 @@ decodeScene.on('text', (ctx) => {
     } else {
         let stringFromZeroWidth = zeroWidthToString.default(userMessage);
         let messageToSend = `✅ String found by decoding zero-wdith characters: ${stringFromZeroWidth}`;
+        if (messageToSend.length > 2000) messageToSend = `⛔️ Sorry, the decoded text was too long to send. The first 25 characters are: ${stringFromZeroWidth.substring(0, 24)}`;
         if (ctx.session.lastSentMessage !== messageToSend) {
             ctx.session.lastSentMessage = messageToSend;
             return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, decodeKeyboard);
@@ -114,6 +115,7 @@ decodeScene.on('document', (ctx) => {
                             let stringFromZeroWidth = zeroWidthToString.default(results);
                             // edit the main message with the results, the previous message is ALWAYS 'Processing...
                             let messageToSend = `✅ Document contained zero-width characters. Decoded string: ${stringFromZeroWidth}`;
+                            if (messageToSend.length > 2000) messageToSend = `⛔️ Sorry, the decoded text was too long to send. The first 25 characters are: ${stringFromZeroWidth.substring(0, 24)}`;
                             return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, decodeKeyboard);
                         } else {
                             let messageToSend = `⚠️ Given file did NOT contain zero-width characters`;
