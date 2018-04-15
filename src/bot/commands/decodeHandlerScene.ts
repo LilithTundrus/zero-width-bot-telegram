@@ -59,7 +59,6 @@ decodeScene.on('text', (ctx) => {
     let userMessage = ctx.message.text.trim();
     // if text is a command, go to that scene!!
     if (userMessage == '💊 Clean') {
-        // leave the scene and enter the next
         return ctx.scene.leave().then(() => {
             return ctx.scene.enter('clean');
         });
@@ -69,7 +68,7 @@ decodeScene.on('text', (ctx) => {
         });
     } else if (userMessage == '📨 Decode') {
         // Doesn't work more than once annoyingly
-        let messageToSend = 'ℹ️ You are already in the 🔍 Detect command!';
+        let messageToSend = 'ℹ️ You are already in the 📨 Decode command!';
         if (ctx.session.lastSentMessage !== messageToSend) {
             ctx.session.lastSentMessage = messageToSend;
             return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, decodeKeyboard);
@@ -79,7 +78,7 @@ decodeScene.on('text', (ctx) => {
             return ctx.scene.enter('detect');
         });
     }
-    // Check if the message is has zero-wdith characters
+    // Check if the message has zero-wdith characters
     if (zeroWidthCheck(userMessage) == false) {
         // Message does not contain anything we can detect
         let messageToSend = `⚠️ Given message did NOT contain zero-width characters`;
@@ -145,8 +144,6 @@ decodeScene.on('document', (ctx) => {
         }
     }
 })
-
-
 
 function zeroWidthCheck(textToCheck: string) {
     let stringFromZeroWidth = zeroWidthToString.default(textToCheck);
