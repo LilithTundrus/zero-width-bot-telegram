@@ -36,6 +36,15 @@ const decodeKeyboard = Extra.HTML()
         { columns: 2 })
 );
 
+const cleanKeyboard = Extra.HTML()
+.markup((m) =>
+    m.inlineKeyboard([
+        m.callbackButton('✉️ Clean Message', 'message'),
+        m.callbackButton('📄 Clean File', 'file'),
+        m.callbackButton('❌ Exit', 'exit')],
+        { columns: 2 })
+);
+
 const adminKeyboard = Extra.HTML()
 .markup((m) =>
     m.inlineKeyboard([
@@ -48,4 +57,4 @@ const adminKeyboard = Extra.HTML()
         { columns: 2 })
 );
 
-export { encodeKeyboard, mainMenuKeyboard, detectKeyboard, decodeKeyboard }
+export { encodeKeyboard, mainMenuKeyboard, detectKeyboard, decodeKeyboard, cleanKeyboard }
