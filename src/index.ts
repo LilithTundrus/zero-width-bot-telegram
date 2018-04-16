@@ -15,16 +15,9 @@ import session from 'telegraf/session';
 import { Message } from 'telegram-typings';
 // #endregion
 
-// TODO: Handle messages that end up being over 2,048 characters
 // TODO: Handle groups vs. individual in the /start
 // TODO: Make sure this is using async and properly non-block threading
 
-/* 
-Gaols/Features:
-This bot will be for decoding/encoding messages through telegram using zero-width characters
-
-It should also be able to detect for the user if a message has or hasn't been fingerprinted with zero-width characters
-*/
 let logger = new Logger('../logs', logLevels.error, true);
 
 // Set limit to 3 message per 3 seconds using telegraf-ratelimit
@@ -71,8 +64,6 @@ if (debug) elapsedTime('Bot polling started');
 logger.info(`zero-width-message-bot ${ver} started at: ${new Date().toISOString()}`);
 
 // Attach functions/classes to the bot's context arguments passed to functions
-
-// TODO: Add a user middleware here to GET and SET certain temp variables??
 bot.context.time = elapsedTime;
 bot.context.resetTimer = resetTimer;
 bot.context.logger = logger;
