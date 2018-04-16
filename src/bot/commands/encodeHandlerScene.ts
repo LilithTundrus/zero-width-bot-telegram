@@ -74,10 +74,7 @@ encodeScene.action('done', (ctx) => {
     if (ctx.session.message == undefined && ctx.session.container == undefined) messageToSend = `⛔️ You must first set a ✉️ Message and a 📁 Container`;
     else if (!ctx.session.container) messageToSend = `⛔️ You are missing a 📁 Container`;
     else if (!ctx.session.message) messageToSend = `⛔️ You are missing a ✉️ Message`;
-    else {
-        messageToSend = `✅ Below is your encoded message!`;
-        // send the user their message
-    }
+    else messageToSend = `✅ Below is your encoded message!`;
     // 'answer' the CB, making the loading icon go away
     ctx.answerCbQuery(ctx.callbackQuery.data);
     if (ctx.session.lastSentMessage !== messageToSend) {
@@ -151,7 +148,7 @@ encodeScene.on('document', (ctx) => {
         ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `🕑 Processing: ${ctx.message.document.file_name} ...`);
         // process the document by reading the file  (potentially using fibers for threading)
         ctx.telegram.getFileLink(ctx.message.document.file_id)
-            .then((link) => {
+            .then((link: string) => {
                 ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
                 // get the file using request (lazy, no downloading)
                 requestUrl(link, 'zero-width-bot-telegram-0.1.0')

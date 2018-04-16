@@ -102,9 +102,7 @@ decodeScene.on('document', (ctx) => {
         ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `🕑 Processing: ${ctx.message.document.file_name} ...`);
         // process the document by reading the file  (potentially using fibers for threading)
         ctx.telegram.getFileLink(ctx.message.document.file_id)
-            .then((link) => {
-                // link to download the file
-                console.log(link);
+            .then((link: string) => {
                 ctx.telegram.sendChatAction(ctx.chat.id, 'typing');
                 // get the file using request (lazy, no downloading)
                 requestUrl(link, 'zero-width-bot-telegram-0.1.0')
