@@ -101,6 +101,7 @@ cleanScene.on('text', (ctx) => {
             return true;
         }).join('');
         let messageToSend = `✅ String with zero-wdith characters removed: ${fixedString}`;
+        if (messageToSend.length > 2000) messageToSend = `⛔️ Sorry, the cleaned text was too long to send. The first 25 characters are: ${stringFromZeroWidth.substring(0, 24)}`;
         if (ctx.session.lastSentMessage !== messageToSend) {
             ctx.session.lastSentMessage = messageToSend;
             return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, cleanKeyboard);
