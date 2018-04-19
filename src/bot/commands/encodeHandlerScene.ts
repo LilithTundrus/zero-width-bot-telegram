@@ -11,16 +11,16 @@ const encodeScene = new Scene('encode');
 
 // on the 'encode' command, a user is brought into a scene to craft a container and message
 encodeScene.enter((parentCtx) => {
-    return parentCtx.reply('You are in ✉️ Encode mode now! use /back or the exit button to leave. Send a message or file to be processed.', encodeKeyboard)
+    return parentCtx.reply('You are in ✉️ Encode mode now! Use /back or the exit button to leave. Send a message or file to be processed.', encodeKeyboard)
         .then((ctx) => {
             // get the id of the message sent to later edit after user input is given
             parentCtx.session.messageToEdit = ctx.message_id;
-            parentCtx.session.lastSentMessage = 'You are in ✉️ Encode mode now! use /back or the exit button to leave. Send a message or file to be processed.';
+            parentCtx.session.lastSentMessage = 'You are in ✉️ Encode mode now! Use /back or the exit button to leave. Send a message or file to be processed.';
         })
 })
 
 encodeScene.leave((parentCtx) => {
-    parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, 'ℹ️ You just left the encode command, all base commands are now available using /menu!')
+    parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, 'ℹ️ You just left the encode command, all base commands are now available using /menu')
         .then(() => {
             // check if they have a temp file
             if (fs.existsSync(`../temp/target${parentCtx.chat.id}.txt`)) {

@@ -11,16 +11,16 @@ const detectScene = new Scene('detect');
 // on enter, give a couple options and an explanation
 detectScene.enter((parentCtx) => {
     // send the keyboard markup
-    return parentCtx.reply('You are in 🔍 Detect mode now! use /back or the exit button to leave. Send a message or file to be processed.', detectKeyboard)
+    return parentCtx.reply('You are in 🔍 Detect mode now! Use /back or the exit button to leave. Send a message or file to be processed.', detectKeyboard)
         .then((ctx) => {
             // get the id of the message sent to later edit after user input is given
             parentCtx.session.messageToEdit = ctx.message_id;
-            parentCtx.session.lastSentMessage = 'You are in 🔍 Detect mode now! use /back or the exit button to leave. Send a message or file to be processed.';
+            parentCtx.session.lastSentMessage = 'You are in 🔍 Detect mode now! Use /back or the exit button to leave. Send a message or file to be processed.';
         })
 })
 
 detectScene.leave((parentCtx) => {
-    parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, 'ℹ️ You just left the detect command, all base commands are now available using /menu!')
+    parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, 'ℹ️ You just left the detect command, all base commands are now available using /menu')
 });
 
 detectScene.command('back', leave());

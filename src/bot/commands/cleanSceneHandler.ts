@@ -13,16 +13,16 @@ const cleanScene = new Scene('clean');
 
 // on the 'clean' command, a user is brought into a scene to clean a message or document
 cleanScene.enter((parentCtx) => {
-    return parentCtx.reply('You are in 💊 Clean mode now! use /back or the exit button to leave. Send a message or file to be processed.', cleanKeyboard)
+    return parentCtx.reply('You are in 💊 Clean mode now! Use /back or the exit button to leave. Send a message or file to be processed.', cleanKeyboard)
         .then((ctx) => {
             // get the id of the message sent to later edit after user input is given
             parentCtx.session.messageToEdit = ctx.message_id;
-            parentCtx.session.lastSentMessage = 'You are in 💊 Clean mode now! use /back or the exit button to leave. Send a message or file to be processed.';
+            parentCtx.session.lastSentMessage = 'You are in 💊 Clean mode now! Use /back or the exit button to leave. Send a message or file to be processed.';
         })
 })
 
 cleanScene.leave((parentCtx) => {
-    parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, 'ℹ️ You just left the clean command, all base commands are now available using /menu!');
+    parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, 'ℹ️ You just left the clean command, all base commands are now available using /menu');
 });
 
 cleanScene.command('back', leave());
