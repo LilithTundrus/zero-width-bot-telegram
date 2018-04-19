@@ -5,15 +5,16 @@ import Scene from 'telegraf/scenes/base';
 // Our custom imports to attach to the composer for telegram command handling
 import startHandler from './startHandler';
 import menuHandler from './menuHandler';
-import processinfoHandler from './processInfoHandler';
+
 // Our scenes to use
 import encodeScene from './encodeHandlerScene';
 import detectScene from './detectHandlerScene';
 import decodeScene from './decodeHandlerScene';
 import cleanScene from './cleanSceneHandler';
+import adminScene from './adminScene';
 
 // Literally 'set the stages' for the composer to user as middleware for certain commands
-const stage = new Stage([encodeScene, detectScene, decodeScene, cleanScene]);
+const stage = new Stage([encodeScene, detectScene, decodeScene, cleanScene, adminScene]);
 const { enter, leave } = Stage;
 
 const composer = new Composer();
@@ -24,7 +25,7 @@ composer.use(
 
 composer.command('start', startHandler);
 composer.command('menu', menuHandler);
-composer.command('procinfo', processinfoHandler);
+composer.command('admin', enter('admin'));
 composer.command('decode', enter('decode'));
 composer.command('encode', enter('encode'));
 composer.command('detect', enter('detect'));

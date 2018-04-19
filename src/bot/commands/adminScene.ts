@@ -1,9 +1,10 @@
 import Stage from 'telegraf/stage';
 import Scene from 'telegraf/scenes/base';
 import { adminKeyboard } from '../keyboardMarkups';
-import { adminID } from '../../config/config';
+import { ver, prod, debug, adminID } from '../../config/config';
+import os from 'os';
 const { enter, leave } = Stage;
-const adminScene = new Scene('decode');
+const adminScene = new Scene('admin');
 
 // All admin commands are accessed through here
 
@@ -42,7 +43,8 @@ adminScene.action('exit', (ctx) => {
 adminScene.action('procinfo', (ctx) => {
     // 'answer' the CB, making the loading icon go away
     ctx.answerCbQuery(ctx.callbackQuery.data);
-    let messageToSend = 'Process Info placeholder';
+    let messageToSend = `Bot Version: ${ver}\n\nRAM Total: ${Math.round(os.totalmem() / 1024 / 1024)}MB\nRAM free: ${Math.round(os.freemem() / 1024 / 1024)}MB\nIn use by Bot: ${Math.round(process.memoryUsage().heapTotal / 1024 / 1024)}MB\nCPU load: ${os.loadavg()[0]}%`;
+    messageToSend = messageToSend + `\n\nUptime: ${formatTime(process.uptime())}\n\nDebug: ${debug}\nProd: ${prod}`;
     if (ctx.session.lastSentMessage !== messageToSend) {
         ctx.session.lastSentMessage = messageToSend;
         return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, adminKeyboard);
@@ -79,3 +81,16 @@ adminScene.action('stats', (ctx) => {
         return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, adminKeyboard);
     }
 });
+
+// format date from UNIX-Long numbers
+function formatTime(seconds: number): string {
+    function pad(s) {
+        return (s < 10 ? '0' : '') + s;
+    }
+    var hours = Math.floor(seconds / (60 * 60));
+    var minutes = Math.floor(seconds % (60 * 60) / 60);
+    var seconds = Math.floor(seconds % 60);
+    return pad(hours) + ':' + pad(minutes) + ':' + pad(seconds);
+}
+
+export default adminScene;
