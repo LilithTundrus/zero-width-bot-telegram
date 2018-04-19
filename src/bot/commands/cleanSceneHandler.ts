@@ -13,16 +13,18 @@ const cleanScene = new Scene('clean');
 
 // on the 'clean' command, a user is brought into a scene to clean a message or document
 cleanScene.enter((parentCtx) => {
-    return parentCtx.reply('You are in 💊 Clean mode now! Use /back or the exit button to leave. Send a message or file to be processed.', cleanKeyboard)
+    let messageToSend = 'You are in 💊 Clean mode now! Use /back or the exit button to leave. Send a message or file to be processed.';
+    return parentCtx.reply(messageToSend, cleanKeyboard)
         .then((ctx) => {
             // get the id of the message sent to later edit after user input is given
             parentCtx.session.messageToEdit = ctx.message_id;
-            parentCtx.session.lastSentMessage = 'You are in 💊 Clean mode now! Use /back or the exit button to leave. Send a message or file to be processed.';
+            parentCtx.session.lastSentMessage = messageToSend;
         })
 })
 
 cleanScene.leave((parentCtx) => {
-    parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, 'ℹ️ You just left the clean command, all base commands are now available using /menu');
+    let messageToSend = 'ℹ️ You just left the clean command, all base commands are now available using /menu';
+    parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, messageToSend);
 });
 
 cleanScene.command('back', leave());
@@ -112,7 +114,8 @@ cleanScene.on('text', (ctx) => {
 cleanScene.on('document', (ctx) => {
     if (ctx.message.document.file_name.includes('.txt') && ctx.message.document.mime_type == 'text/plain') {
         // TODO: record the filename to a var to user later down below!!!
-        ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, `🕑 Processing: ${ctx.message.document.file_name} ...`);
+        let messageToSend = `🕑 Processing: ${ctx.message.document.file_name} ...`;
+        ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend);
         // process the document by reading the file  (potentially using fibers for threading)
         ctx.telegram.getFileLink(ctx.message.document.file_id)
             .then((link: string) => {

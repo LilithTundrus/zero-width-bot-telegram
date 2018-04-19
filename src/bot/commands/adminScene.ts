@@ -7,25 +7,29 @@ const adminScene = new Scene('decode');
 
 // All admin commands are accessed through here
 
-// on the 'admin' command, a user is brought into a scene to manbage bot functionality
+// on the 'admin' command, a user is brought into a scene to mannage bot functionality
 adminScene.enter((parentCtx) => {
+    // We only want the registered admin accessing this
     if (parentCtx.chat.id == adminID) {
-        return parentCtx.reply('You are in 🕶 Admin mode now. Use /back or the exit button to leave.', adminKeyboard)
+        let messageToSend = 'You are in 🕶 Admin mode now. Use /back or the exit button to leave.';
+        return parentCtx.reply(messageToSend, adminKeyboard)
             .then((ctx) => {
                 // get the id of the message sent to later edit after user input is given
                 parentCtx.session.messageToEdit = ctx.message_id;
-                parentCtx.session.lastSentMessage = 'You are in 🕶 Admin mode now! use /back or the exit button to leave.';
+                // For preventing telegram '400: no change' errors on message edits
+                parentCtx.session.lastSentMessage = messageToSend;
             })
     } else {
         parentCtx.reply(`You are not registered as an Admin, this access attempt will be reported.`);
-        parentCtx.logger.warn(`${parentCtx.message.from} used the admin command at: ${new Date().toISOString()}`);
-        return parentCtx.telegram.sendMessage(`${parentCtx.message.from} used the admin command at: ${new Date().toISOString()}`);
+        let warnMessage = `${parentCtx.message.from} used the admin command at: ${new Date().toISOString()}`;
+        parentCtx.logger.warn(warnMessage);
+        return parentCtx.telegram.sendMessage(warnMessage);
     }
-
-})
+});
 
 adminScene.leave((parentCtx) => {
-    parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, 'ℹ️ You just left the Admin command, all base commands are now available using /menu');
+    let messageToSend = 'ℹ️ You just left the Admin command, all base commands are now available using /menu';
+    parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, messageToSend);
 });
 
 // Listen for an exit callback
@@ -47,6 +51,7 @@ adminScene.action('procinfo', (ctx) => {
 
 adminScene.action('logs', (ctx) => {
     // 'answer' the CB, making the loading icon go away
+    // we only need WARN and ERROR logs
     ctx.answerCbQuery(ctx.callbackQuery.data);
     let messageToSend = 'Logs placeholder';
     if (ctx.session.lastSentMessage !== messageToSend) {
