@@ -55,4 +55,4 @@ const adminKeyboard = Extra.HTML()
             { columns: 2 })
     );
 
-export { encodeKeyboard, mainMenuKeyboard, detectKeyboard, decodeKeyboard, cleanKeyboard }
+export { encodeKeyboard, mainMenuKeyboard, detectKeyboard, decodeKeyboard, cleanKeyboard, adminKeyboard }
