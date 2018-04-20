@@ -21,6 +21,10 @@ PlaceHolder
 
 ## History
 
+- **v0.1.1**
+    - If an `encode` container has spaces, the first will be used to hide the message, reducing acidental discovery
+
+
 - **v0.1.0**
     - Initial stable release
 
