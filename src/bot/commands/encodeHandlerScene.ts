@@ -82,7 +82,14 @@ encodeScene.action('done', (ctx) => {
         return ctx.telegram.editMessageText(ctx.chat.id, ctx.session.messageToEdit, null, messageToSend, encodeKeyboard)
             .then(() => {
                 if (ctx.session.message && ctx.session.container) {
-                    let encodedMessage = `${ctx.session.container}${stringToZeroWidth.default(ctx.session.message)}`;
+                    let encodedMessage: string;
+                    // try and 'smartly' hide the zero-width message
+                    if (ctx.session.container.includes(' ')) {
+                        let containerFirstSpace = ctx.session.container.indexOf(' ');
+                        let zeroWidthMessage = stringToZeroWidth.default(ctx.session.message);
+                        encodedMessage = insert(ctx.session.container, zeroWidthMessage, containerFirstSpace);
+                    }
+                    else encodedMessage = `${ctx.session.container}${stringToZeroWidth.default(ctx.session.message)}`;
                     if (encodedMessage.length > 2000) encodedMessage = `⛔️ Sorry, the encoded text was too long to send. Try encoding a smaller message or encode using the 📄 Encode File option`;
                     return ctx.reply(encodedMessage);
                 }
@@ -190,5 +197,15 @@ encodeScene.on('document', (ctx) => {
         }
     }
 });
+
+function insert(main_string, ins_string, pos) {
+    if (typeof (pos) == "undefined") {
+        pos = 0;
+    }
+    if (typeof (ins_string) == "undefined") {
+        ins_string = '';
+    }
+    return main_string.slice(0, pos) + ins_string + main_string.slice(pos);
+}
 
 export default encodeScene;

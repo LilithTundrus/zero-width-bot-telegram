@@ -64,6 +64,7 @@ adminScene.action('logs', (ctx) => {
 
 adminScene.action('restart', (ctx) => {
     // 'answer' the CB, making the loading icon go away
+    // self-restart the bot (another process perhaps?)
     ctx.answerCbQuery(ctx.callbackQuery.data);
     let messageToSend = 'Restart placeholder';
     if (ctx.session.lastSentMessage !== messageToSend) {
@@ -74,6 +75,7 @@ adminScene.action('restart', (ctx) => {
 
 adminScene.action('stats', (ctx) => {
     // 'answer' the CB, making the loading icon go away
+    // statistics about the bot, perhaps number of /starts, average response-time, etc.
     ctx.answerCbQuery(ctx.callbackQuery.data);
     let messageToSend = 'Stats placeholder';
     if (ctx.session.lastSentMessage !== messageToSend) {
