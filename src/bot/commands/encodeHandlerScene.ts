@@ -11,16 +11,18 @@ const encodeScene = new Scene('encode');
 
 // on the 'encode' command, a user is brought into a scene to craft a container and message
 encodeScene.enter((parentCtx) => {
-    return parentCtx.reply('You are in ✉️ Encode mode now! Use /back or the exit button to leave. Send a message or file to be processed.', encodeKeyboard)
+    let messageToSend = 'You are in ✉️ Encode mode now! Use /back or the exit button to leave. Send a message or file to be processed.';
+    return parentCtx.reply(messageToSend, encodeKeyboard)
         .then((ctx) => {
             // get the id of the message sent to later edit after user input is given
             parentCtx.session.messageToEdit = ctx.message_id;
-            parentCtx.session.lastSentMessage = 'You are in ✉️ Encode mode now! Use /back or the exit button to leave. Send a message or file to be processed.';
+            parentCtx.session.lastSentMessage = messageToSend;
         })
 })
 
 encodeScene.leave((parentCtx) => {
-    parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, 'ℹ️ You just left the encode command, all base commands are now available using /menu')
+    let messageToSend = 'ℹ️ You just left the encode command, all base commands are now available using /menu';
+    parentCtx.telegram.editMessageText(parentCtx.chat.id, parentCtx.session.messageToEdit, null, messageToSend)
         .then(() => {
             // check if they have a temp file
             if (fs.existsSync(`../temp/target${parentCtx.chat.id}.txt`)) {
@@ -71,7 +73,9 @@ encodeScene.action('container', (ctx) => {
 
 encodeScene.action('done', (ctx) => {
     let messageToSend = '🕑 Creating your encoded message....';
-    if (ctx.session.message == undefined && ctx.session.container == undefined) messageToSend = `⛔️ You must first set a ✉️ Message and a 📁 Container`;
+    if (ctx.session.message == undefined && ctx.session.container == undefined) {
+        messageToSend = `⛔️ You must first set a ✉️ Message and a 📁 Container`;
+    }
     else if (!ctx.session.container) messageToSend = `⛔️ You are missing a 📁 Container`;
     else if (!ctx.session.message) messageToSend = `⛔️ You are missing a ✉️ Message`;
     else messageToSend = `✅ Below is your encoded message!`;
@@ -90,15 +94,25 @@ encodeScene.action('done', (ctx) => {
                         encodedMessage = insert(ctx.session.container, zeroWidthMessage, containerFirstSpace);
                     }
                     else encodedMessage = `${ctx.session.container}${stringToZeroWidth.default(ctx.session.message)}`;
-                    if (encodedMessage.length > 2000) encodedMessage = `⛔️ Sorry, the encoded text was too long to send. Try encoding a smaller message or encode using the 📄 Encode File option`;
+                    // check message length 
+                    if (encodedMessage.length > 2000) {
+                        encodedMessage = `⛔️ Sorry, the encoded text was too long to send. Try encoding a smaller message or encode using the 📄 Encode File option`;
+                    }
                     return ctx.reply(encodedMessage);
                 }
+            })
+            .catch((err) => {
+                // let the user know something went wrong and send a message to the admin
+                ctx.reply(`⛔️ Looks like something went wrong with parsing your message. I've sent a ticket about the issue, please try again later!`);
+                ctx.scene.leave();
+                ctx.telegram.sendMessage(adminID, err.toString());
+                return ctx.logger.error(err);
             })
     }
 });
 
 encodeScene.action('file', (ctx) => {
-    let messageToSend = 'ℹ️ Send a file to check encode!';
+    let messageToSend = 'ℹ️ Send a file to encode!';
     // 'answer' the CB, making the loading icon go away
     ctx.answerCbQuery(ctx.callbackQuery.data);
     if (ctx.session.lastSentMessage !== messageToSend) {
@@ -162,7 +176,15 @@ encodeScene.on('document', (ctx) => {
                 requestUrl(link, 'zero-width-bot-telegram-0.1.0')
                     .then((results: string) => {
                         // get the file, find a space, append the zero-width message there, if no spaces just append the zero-width message
-                        return fs.writeFile(`../temp/target${ctx.chat.id}.txt`, `${results}${stringToZeroWidth.default(ctx.session.message)}`, (err) => {
+                        let encodedMessage: string;
+                        // try and 'smartly' hide the zero-width message
+                        if (results.includes(' ')) {
+                            let containerFirstSpace = results.indexOf(' ');
+                            let zeroWidthMessage = stringToZeroWidth.default(results);
+                            encodedMessage = insert(results, zeroWidthMessage, containerFirstSpace);
+                        }
+                        else encodedMessage = `${results}${stringToZeroWidth.default(ctx.session.message)}`;
+                        return fs.writeFile(`../temp/target${ctx.chat.id}.txt`, encodedMessage, (err) => {
                             if (err) {
                                 throw err;
                             }
@@ -183,7 +205,6 @@ encodeScene.on('document', (ctx) => {
                         return ctx.logger.error(err);
                     })
             })
-        // check file size (should be under 16k)
     } else if (ctx.message.document.file_size > 16000) {
         let messageToSend = `⛔️ Please send a file in text format under 16k`;
         if (ctx.session.lastSentMessage !== messageToSend) {
