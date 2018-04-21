@@ -36,7 +36,7 @@ The **💊 Clean** or **/clean** command can help you remove zero-width characte
 
 ![Encode Mode](https://github.com/LilithTundrus/zero-width-bot-telegram/blob/master/iamges/encode.png)
 
-The **✉️ Encode** or **/encode** command allows you to encode a message hidden using zero-width chracters inside a file or a message. You must set a message and a container/file
+The **✉️ Encode** or **/encode** command allows you to encode a hidden message using zero-width chracters inside a file or a **container** (proxy message)
 
 
 ### 📨 Decode
