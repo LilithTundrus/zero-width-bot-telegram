@@ -45,6 +45,7 @@ The **✉️ Encode** or **/encode** command allows you to encode a message hidd
 
 The **📨 Decode** or **/decode** command will check for zero-width characters in a message of a dile file (up to 16KB) and attempt to decode the message inside the zero-width characters. This means that the bot can **📨 Decode** its own **✉️ Encode** messages!
 
+
 ## History
 
 - **v0.1.1**
