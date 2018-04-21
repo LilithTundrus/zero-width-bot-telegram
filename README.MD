@@ -18,7 +18,7 @@ If you're not sure what zero-width characters are or what they can be used for c
 
 ### 🔍 Detect
 
-![Detect Mode](https://raw.githubusercontent.com/lilithtundrus/zero-width-bot-telegram/master/images/detect.png)
+![Detect Mode](https://github.com/LilithTundrus/zero-width-bot-telegram/blob/master/iamges/detect.png)
 
 The **🔍 Detect** or **/detect** command can help you detect zero-width characters from pasted text or from a (up to 16KB) text file
 
