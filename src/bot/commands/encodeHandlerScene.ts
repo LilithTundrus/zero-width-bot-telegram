@@ -142,6 +142,7 @@ encodeScene.on('text', (ctx) => {
     }
 });
 
+// TODO: check for spaces like we do with the messages
 encodeScene.on('document', (ctx) => {
     if (!ctx.session.message) {
         let messageToSend = `⛔️ You need to set a ✉️ Message to encode into the document!`;
